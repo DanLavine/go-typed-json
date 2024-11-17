@@ -63,7 +63,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		if err != nil {
 			return fmt.Errorf("failed to convert %s, to an int", temp.Value)
 		}
-		typedJson.Value = val
+		typedJson.Value = int(val)
 	case INT8:
 		val, err := strconv.ParseInt(temp.Value, 10, 8)
 		if err != nil {
