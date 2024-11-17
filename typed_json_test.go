@@ -1,0 +1,1 @@
+package gotypedjson_test
