@@ -170,32 +170,88 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 
 	switch typedJson.Type {
 	case INT:
+		if _, ok := typedJson.Value.(int); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an int", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatInt(int64(typedJson.Value.(int)), 10)
 	case INT8:
+		if _, ok := typedJson.Value.(int8); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an int8", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatInt(int64(typedJson.Value.(int8)), 10)
 	case INT16:
+		if _, ok := typedJson.Value.(int16); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an int16", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatInt(int64(typedJson.Value.(int16)), 10)
 	case INT32:
+		if _, ok := typedJson.Value.(int32); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an int32", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatInt(int64(typedJson.Value.(int32)), 10)
 	case INT64:
+		if _, ok := typedJson.Value.(int64); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an int64", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatInt(int64(typedJson.Value.(int64)), 10)
 	case UINT:
+		if _, ok := typedJson.Value.(uint); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an uint", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatUint(uint64(typedJson.Value.(uint)), 10)
 	case UINT8:
+		if _, ok := typedJson.Value.(uint8); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an uint8", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatUint(uint64(typedJson.Value.(uint8)), 10)
 	case UINT16:
+		if _, ok := typedJson.Value.(uint16); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an uint16", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatUint(uint64(typedJson.Value.(uint16)), 10)
 	case UINT32:
+		if _, ok := typedJson.Value.(uint32); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an uint32", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatUint(uint64(typedJson.Value.(uint32)), 10)
 	case UINT64:
+		if _, ok := typedJson.Value.(uint64); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to an uint64", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatUint(uint64(typedJson.Value.(uint64)), 10)
 	case FLOAT32:
+		if _, ok := typedJson.Value.(float32); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a float32", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatFloat(float64(typedJson.Value.(float32)), 'E', -1, 32)
 	case FLOAT64:
+		if _, ok := typedJson.Value.(float64); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a float64", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatFloat(float64(typedJson.Value.(float32)), 'E', -1, 64)
 	case STRING:
+		if _, ok := typedJson.Value.(string); !ok {
+			return nil, fmt.Errorf("value '%v' is expected to be a string", typedJson.Value)
+		}
+
 		temp.Value = typedJson.Value.(string)
 	case BOOL:
+		if _, ok := typedJson.Value.(bool); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a bool", typedJson.Value)
+		}
+
 		temp.Value = strconv.FormatBool(typedJson.Value.(bool))
 	default:
 		// might be a custom type
