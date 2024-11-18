@@ -76,3 +76,164 @@ func Test_Int16(t *testing.T) {
 		g.Expect(tInt.Value.(int16)).To(Equal(int16(4)))
 	})
 }
+
+func Test_Int32(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":3,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tInt := &gotypedjson.TypedJson{Type: gotypedjson.INT32, Value: int32(4)}
+
+		data, err := json.Marshal(tInt)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tInt := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tInt)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tInt.Type).To(Equal(gotypedjson.INT32))
+		g.Expect(tInt.Value.(int32)).To(Equal(int32(4)))
+	})
+}
+
+func Test_Int64(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":4,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tInt := &gotypedjson.TypedJson{Type: gotypedjson.INT64, Value: int64(4)}
+
+		data, err := json.Marshal(tInt)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tInt := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tInt)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tInt.Type).To(Equal(gotypedjson.INT64))
+		g.Expect(tInt.Value.(int64)).To(Equal(int64(4)))
+	})
+}
+
+func Test_Uint(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":5,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tUint := &gotypedjson.TypedJson{Type: gotypedjson.UINT, Value: uint(4)}
+
+		data, err := json.Marshal(tUint)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tInt := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tInt)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tInt.Type).To(Equal(gotypedjson.UINT))
+		g.Expect(tInt.Value.(uint)).To(Equal(uint(4)))
+	})
+}
+
+func Test_Uint8(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":6,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tUint8 := &gotypedjson.TypedJson{Type: gotypedjson.UINT8, Value: uint8(4)}
+
+		data, err := json.Marshal(tUint8)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tUint8 := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tUint8)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tUint8.Type).To(Equal(gotypedjson.UINT8))
+		g.Expect(tUint8.Value.(uint8)).To(Equal(uint8(4)))
+	})
+}
+
+func Test_Uint16(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":7,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tUint16 := &gotypedjson.TypedJson{Type: gotypedjson.UINT16, Value: uint16(4)}
+
+		data, err := json.Marshal(tUint16)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tUint16 := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tUint16)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tUint16.Type).To(Equal(gotypedjson.UINT16))
+		g.Expect(tUint16.Value.(uint16)).To(Equal(uint16(4)))
+	})
+}
+
+func Test_Uint32(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":8,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tUint32 := &gotypedjson.TypedJson{Type: gotypedjson.UINT32, Value: uint32(4)}
+
+		data, err := json.Marshal(tUint32)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tUint32 := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tUint32)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tUint32.Type).To(Equal(gotypedjson.UINT32))
+		g.Expect(tUint32.Value.(uint32)).To(Equal(uint32(4)))
+	})
+}
+
+func Test_Uint64(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":9,"Value":"4"}`
+
+	t.Run("It can encode the value properly", func(t *testing.T) {
+		tUint64 := &gotypedjson.TypedJson{Type: gotypedjson.UINT64, Value: uint64(4)}
+
+		data, err := json.Marshal(tUint64)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(string(data)).To(Equal(rawData))
+	})
+
+	t.Run("It can decode the value properly", func(t *testing.T) {
+		tUint64 := &gotypedjson.TypedJson{}
+
+		err := json.Unmarshal([]byte(rawData), tUint64)
+		g.Expect(err).ToNot(HaveOccurred())
+		g.Expect(tUint64.Type).To(Equal(gotypedjson.UINT64))
+		g.Expect(tUint64.Value.(uint64)).To(Equal(uint64(4)))
+	})
+}
