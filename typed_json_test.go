@@ -74,13 +74,23 @@ func Test_Int8(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tInt := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tInt8 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tInt)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tInt.Type).To(Equal(gotypedjson.INT8))
-		g.Expect(tInt.Value.(int8)).To(Equal(int8(4)))
+			err := json.Unmarshal([]byte(`{"Type":1,"Value":"nope"}`), tInt8)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int8"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tInt8 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tInt8)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tInt8.Type).To(Equal(gotypedjson.INT8))
+			g.Expect(tInt8.Value.(int8)).To(Equal(int8(4)))
+		})
 	})
 }
 
@@ -107,13 +117,23 @@ func Test_Int16(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tInt := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tInt16 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tInt)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tInt.Type).To(Equal(gotypedjson.INT16))
-		g.Expect(tInt.Value.(int16)).To(Equal(int16(4)))
+			err := json.Unmarshal([]byte(`{"Type":2,"Value":"nope"}`), tInt16)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int16"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tInt16 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tInt16)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tInt16.Type).To(Equal(gotypedjson.INT16))
+			g.Expect(tInt16.Value.(int16)).To(Equal(int16(4)))
+		})
 	})
 }
 
@@ -140,13 +160,23 @@ func Test_Int32(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tInt := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tInt32 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tInt)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tInt.Type).To(Equal(gotypedjson.INT32))
-		g.Expect(tInt.Value.(int32)).To(Equal(int32(4)))
+			err := json.Unmarshal([]byte(`{"Type":3,"Value":"nope"}`), tInt32)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int32"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tInt32 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tInt32)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tInt32.Type).To(Equal(gotypedjson.INT32))
+			g.Expect(tInt32.Value.(int32)).To(Equal(int32(4)))
+		})
 	})
 }
 
@@ -173,13 +203,23 @@ func Test_Int64(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tInt := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tInt64 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tInt)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tInt.Type).To(Equal(gotypedjson.INT64))
-		g.Expect(tInt.Value.(int64)).To(Equal(int64(4)))
+			err := json.Unmarshal([]byte(`{"Type":4,"Value":"nope"}`), tInt64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int64"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tInt16 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tInt16)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tInt16.Type).To(Equal(gotypedjson.INT64))
+			g.Expect(tInt16.Value.(int64)).To(Equal(int64(4)))
+		})
 	})
 }
 
@@ -206,13 +246,23 @@ func Test_Uint(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tInt := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tUint := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tInt)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tInt.Type).To(Equal(gotypedjson.UINT))
-		g.Expect(tInt.Value.(uint)).To(Equal(uint(4)))
+			err := json.Unmarshal([]byte(`{"Type":5,"Value":"nope"}`), tUint)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tInt := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tInt)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tInt.Type).To(Equal(gotypedjson.UINT))
+			g.Expect(tInt.Value.(uint)).To(Equal(uint(4)))
+		})
 	})
 }
 
@@ -239,13 +289,23 @@ func Test_Uint8(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tUint8 := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tUint8 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tUint8)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tUint8.Type).To(Equal(gotypedjson.UINT8))
-		g.Expect(tUint8.Value.(uint8)).To(Equal(uint8(4)))
+			err := json.Unmarshal([]byte(`{"Type":6,"Value":"nope"}`), tUint8)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint8"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tUint8 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tUint8)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tUint8.Type).To(Equal(gotypedjson.UINT8))
+			g.Expect(tUint8.Value.(uint8)).To(Equal(uint8(4)))
+		})
 	})
 }
 
@@ -272,13 +332,23 @@ func Test_Uint16(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tUint16 := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tUint16 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tUint16)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tUint16.Type).To(Equal(gotypedjson.UINT16))
-		g.Expect(tUint16.Value.(uint16)).To(Equal(uint16(4)))
+			err := json.Unmarshal([]byte(`{"Type":7,"Value":"nope"}`), tUint16)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint16"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tUint16 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tUint16)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tUint16.Type).To(Equal(gotypedjson.UINT16))
+			g.Expect(tUint16.Value.(uint16)).To(Equal(uint16(4)))
+		})
 	})
 }
 
@@ -305,13 +375,23 @@ func Test_Uint32(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tUint32 := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tUint32 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tUint32)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tUint32.Type).To(Equal(gotypedjson.UINT32))
-		g.Expect(tUint32.Value.(uint32)).To(Equal(uint32(4)))
+			err := json.Unmarshal([]byte(`{"Type":8,"Value":"nope"}`), tUint32)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint32"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tUint32 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tUint32)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tUint32.Type).To(Equal(gotypedjson.UINT32))
+			g.Expect(tUint32.Value.(uint32)).To(Equal(uint32(4)))
+		})
 	})
 }
 
@@ -338,12 +418,22 @@ func Test_Uint64(t *testing.T) {
 		})
 	})
 
-	t.Run("It can decode the value properly", func(t *testing.T) {
-		tUint64 := &gotypedjson.TypedJson{}
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tUint64 := &gotypedjson.TypedJson{}
 
-		err := json.Unmarshal([]byte(rawData), tUint64)
-		g.Expect(err).ToNot(HaveOccurred())
-		g.Expect(tUint64.Type).To(Equal(gotypedjson.UINT64))
-		g.Expect(tUint64.Value.(uint64)).To(Equal(uint64(4)))
+			err := json.Unmarshal([]byte(`{"Type":9,"Value":"nope"}`), tUint64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint64"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tUint64 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tUint64)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tUint64.Type).To(Equal(gotypedjson.UINT64))
+			g.Expect(tUint64.Value.(uint64)).To(Equal(uint64(4)))
+		})
 	})
 }

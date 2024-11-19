@@ -109,7 +109,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 	case UINT32:
 		val, err := strconv.ParseUint(temp.Value, 10, 32)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint", temp.Value)
+			return fmt.Errorf("failed to convert %s, to a uint32", temp.Value)
 		}
 		typedJson.Value = uint32(val)
 	case UINT64:
