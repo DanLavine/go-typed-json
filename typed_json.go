@@ -131,7 +131,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		}
 		typedJson.Value = float64(val)
 	case STRING:
-		typedJson.Value = temp.Value
+		typedJson.Value = string(temp.Value)
 	case BOOL:
 		val, err := strconv.ParseBool(temp.Value)
 		if err != nil {
@@ -240,10 +240,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 			return nil, fmt.Errorf("failed to cast '%v' to a float64", typedJson.Value)
 		}
 
-		temp.Value = strconv.FormatFloat(float64(typedJson.Value.(float32)), 'E', -1, 64)
+		temp.Value = strconv.FormatFloat(float64(typedJson.Value.(float64)), 'E', -1, 64)
 	case STRING:
 		if _, ok := typedJson.Value.(string); !ok {
-			return nil, fmt.Errorf("value '%v' is expected to be a string", typedJson.Value)
+			return nil, fmt.Errorf("failed to cast '%v' to a string", typedJson.Value)
 		}
 
 		temp.Value = typedJson.Value.(string)

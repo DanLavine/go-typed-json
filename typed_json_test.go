@@ -437,3 +437,175 @@ func Test_Uint64(t *testing.T) {
 		})
 	})
 }
+
+func Test_Float32(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":10,"Value":"4E+00"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tFloat32 := &gotypedjson.TypedJson{Type: gotypedjson.FLOAT32, Value: "nope"}
+			data, err := json.Marshal(tFloat32)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a float32"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tFloat32 := &gotypedjson.TypedJson{Type: gotypedjson.FLOAT32, Value: float32(4.0)}
+
+			data, err := json.Marshal(tFloat32)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tFloat32 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":10,"Value":"nope"}`), tFloat32)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float32"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tFloat32 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tFloat32)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tFloat32.Type).To(Equal(gotypedjson.FLOAT32))
+			g.Expect(tFloat32.Value.(float32)).To(Equal(float32(4.0)))
+		})
+	})
+}
+
+func Test_Float64(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":11,"Value":"4E+00"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tFloat64 := &gotypedjson.TypedJson{Type: gotypedjson.FLOAT64, Value: "nope"}
+			data, err := json.Marshal(tFloat64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a float64"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tFloat64 := &gotypedjson.TypedJson{Type: gotypedjson.FLOAT64, Value: float64(4.0)}
+
+			data, err := json.Marshal(tFloat64)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tFloat64 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":11,"Value":"nope"}`), tFloat64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float64"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tFloat64 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tFloat64)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tFloat64.Type).To(Equal(gotypedjson.FLOAT64))
+			g.Expect(tFloat64.Value.(float64)).To(Equal(float64(4.0)))
+		})
+	})
+}
+
+func Test_String(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":12,"Value":"proper string"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tString := &gotypedjson.TypedJson{Type: gotypedjson.STRING, Value: 3}
+			data, err := json.Marshal(tString)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast '3' to a string"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tString := &gotypedjson.TypedJson{Type: gotypedjson.STRING, Value: "proper string"}
+
+			data, err := json.Marshal(tString)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tString := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":12,"Value":3}`), tString)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: cannot unmarshal number into Go struct field .Value of type string"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tString := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tString)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tString.Type).To(Equal(gotypedjson.STRING))
+			g.Expect(tString.Value.(string)).To(Equal("proper string"))
+		})
+	})
+}
+
+func Test_Bool(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":13,"Value":"true"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tBool := &gotypedjson.TypedJson{Type: gotypedjson.BOOL, Value: "nope"}
+			data, err := json.Marshal(tBool)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a bool"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tBool := &gotypedjson.TypedJson{Type: gotypedjson.BOOL, Value: true}
+
+			data, err := json.Marshal(tBool)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tBool := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":13,"Value":"nope"}`), tBool)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert nope, to a bool"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tBool := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tBool)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tBool.Type).To(Equal(gotypedjson.BOOL))
+			g.Expect(tBool.Value.(bool)).To(BeTrue())
+		})
+	})
+}
