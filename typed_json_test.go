@@ -2,6 +2,8 @@ package gotypedjson_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"testing"
 
 	gotypedjson "github.com/DanLavine/go-typed-json"
@@ -606,6 +608,50 @@ func Test_Bool(t *testing.T) {
 			g.Expect(err).ToNot(HaveOccurred())
 			g.Expect(tBool.Type).To(Equal(gotypedjson.BOOL))
 			g.Expect(tBool.Value.(bool)).To(BeTrue())
+		})
+	})
+}
+
+func Test_CustomEncoderes(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("Describe overwritting default encoders", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.INT: {
+				Encode: func(val any) (string, error) {
+					return fmt.Sprintf("%d", val.(int)+5), nil
+				},
+				Decode: func(s string) (any, error) {
+					val, err := strconv.ParseInt(s, 10, 0)
+					if err != nil {
+						return nil, fmt.Errorf("failed to convert %s, to an int", s)
+					}
+
+					return int(val) - 5, nil
+				},
+			},
+		}
+
+		t.Run("It can use the custom encoder", func(t *testing.T) {
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 5, codec)
+
+			data, err := tCustom.MarshalJSON()
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(`{"Type":0,"Value":"10"}`))
+		})
+
+		// This kind of sucks. I don't want to use new here since a value should be nil from the server if nothing
+		// was sent. This kind of breaks that behavior...
+		//
+		// I can do it purely in "API" terms if I use a generic map[key name]TypedJson, but still I need to define
+		// all the keys up front with the decoders. This is tricky
+		t.Run("It can use the custom decoder", func(t *testing.T) {
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, codec)
+
+			err := json.Unmarshal([]byte(`{"Type":0,"Value":"10"}`), tCustom)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
+			g.Expect(tCustom.Value.(int)).To(Equal(5))
 		})
 	})
 }

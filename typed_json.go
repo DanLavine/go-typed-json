@@ -8,9 +8,9 @@ import (
 
 type JSONTYPE int
 
-type CustomEncoder map[JSONTYPE]Encoder
+type CustomCodec map[JSONTYPE]Codec
 
-type Encoder struct {
+type Codec struct {
 	Encode func(val any) (string, error)
 	Decode func(s string) (any, error)
 }
@@ -36,14 +36,24 @@ type TypedJson struct {
 	Type  JSONTYPE `json:"Type"`
 	Value any      `json:"Value"`
 
-	customEncoder CustomEncoder
+	customCodec CustomCodec
 }
 
-func NewTypedJson(jsonType JSONTYPE, Value any, customEncoder CustomEncoder) *TypedJson {
+func NewTypedJson(jsonType JSONTYPE, Value any, customCodec CustomCodec) *TypedJson {
+	for key, value := range customCodec {
+		if value.Encode == nil {
+			panic(fmt.Sprintf("key %d has a nil encoder", key))
+		}
+
+		if value.Decode == nil {
+			panic(fmt.Sprintf("key %d has a nil decoder", key))
+		}
+	}
+
 	return &TypedJson{
-		Type:          jsonType,
-		Value:         Value,
-		customEncoder: customEncoder,
+		Type:        jsonType,
+		Value:       Value,
+		customCodec: customCodec,
 	}
 }
 
@@ -57,6 +67,23 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
+	typedJson.Type = temp.Type
+
+	// try the custom types
+	if typedJson.customCodec != nil {
+		if encoder, ok := typedJson.customCodec[temp.Type]; ok {
+			val, err := encoder.Decode(temp.Value)
+			if err != nil {
+				return err
+			}
+
+			typedJson.Value = val
+
+			return nil
+		}
+	}
+
+	// try the default types
 	switch temp.Type {
 	case INT:
 		val, err := strconv.ParseInt(temp.Value, 10, 0)
@@ -139,23 +166,8 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		}
 		typedJson.Value = bool(val)
 	default:
-		if typedJson.customEncoder != nil {
-			if encoder, ok := typedJson.customEncoder[temp.Type]; ok {
-				val, err := encoder.Decode(temp.Value)
-				if err != nil {
-					return err
-				}
-
-				typedJson.Value = val
-			} else {
-				return fmt.Errorf("unknown type %d recevied for: %s", temp.Type, temp.Value)
-			}
-		} else {
-			return fmt.Errorf("unknown type %d recevied for: %s", temp.Type, temp.Value)
-		}
+		return fmt.Errorf("unknown type %d recevied for: %s", temp.Type, temp.Value)
 	}
-
-	typedJson.Type = temp.Type
 
 	return nil
 }
@@ -168,6 +180,20 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		Type: typedJson.Type,
 	}
 
+	// might be a custom type
+	if typedJson.customCodec != nil {
+		if encoder, ok := typedJson.customCodec[typedJson.Type]; ok {
+			assignString, err := encoder.Encode(typedJson.Value)
+			if err != nil {
+				return nil, err
+			}
+
+			temp.Value = assignString
+			return json.Marshal(temp)
+		}
+	}
+
+	// check the defualt types
 	switch typedJson.Type {
 	case INT:
 		if _, ok := typedJson.Value.(int); !ok {
@@ -254,21 +280,7 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 
 		temp.Value = strconv.FormatBool(typedJson.Value.(bool))
 	default:
-		// might be a custom type
-		if typedJson.customEncoder != nil {
-			if encoder, ok := typedJson.customEncoder[typedJson.Type]; ok {
-				assignString, err := encoder.Encode(typedJson.Value)
-				if err != nil {
-					return nil, err
-				}
-
-				temp.Value = assignString
-			} else {
-				return nil, fmt.Errorf("unknow type to encode %d for %v", temp.Type, typedJson.Value)
-			}
-		} else {
-			return nil, fmt.Errorf("unknow type to encode %d for %v", temp.Type, typedJson.Value)
-		}
+		return nil, fmt.Errorf("unknow type to encode %d for %v", temp.Type, typedJson.Value)
 	}
 
 	return json.Marshal(temp)
