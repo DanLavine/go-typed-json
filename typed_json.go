@@ -32,11 +32,15 @@ const (
 	BOOL    JSONTYPE = 14
 )
 
+// Codec are used to Encode and Decode JSONTYPE data
 type Codec struct {
+	// Encoded the data into a string for data integrity
 	Encode func(val any) (string, error)
+	// Decode an encoded string back into its original valie
 	Decode func(s string) (any, error)
 }
 
+// CustomCodec are used to associate specific types with their encoding and decoding functions
 type CustomCodec map[JSONTYPE]Codec
 
 // TypedJson define the specifc Type of JSON Value, dictaing how to encode and decode the value. By default, all values
