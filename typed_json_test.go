@@ -10,10 +10,66 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_NewCodecJson(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("It panics if a codec encode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Encode: func(val any) (string, error) { return "", nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewCodecJson(codec)
+		}).To(Panic())
+	})
+
+	t.Run("It panics if a codec decode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Decode: func(s string) (any, error) { return nil, nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewCodecJson(codec)
+		}).To(Panic())
+	})
+}
+
+func Test_NewTypedJson(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("It panics if a codec encode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Encode: func(val any) (string, error) { return "", nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewTypedJson(gotypedjson.INT, int(2), codec)
+		}).To(Panic())
+	})
+
+	t.Run("It panics if a codec decode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Decode: func(s string) (any, error) { return nil, nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewTypedJson(gotypedjson.INT, int(2), codec)
+		}).To(Panic())
+	})
+}
+
 func Test_Int(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":0,"Value":"4"}`
+	rawData := `{"Type":1,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -37,7 +93,7 @@ func Test_Int(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":0,"Value":"nope"}`), tInt)
+			err := json.Unmarshal([]byte(`{"Type":1,"Value":"nope"}`), tInt)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int"))
 		})
@@ -56,7 +112,7 @@ func Test_Int(t *testing.T) {
 func Test_Int8(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":1,"Value":"4"}`
+	rawData := `{"Type":2,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -80,7 +136,7 @@ func Test_Int8(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt8 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":1,"Value":"nope"}`), tInt8)
+			err := json.Unmarshal([]byte(`{"Type":2,"Value":"nope"}`), tInt8)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int8"))
 		})
@@ -99,7 +155,7 @@ func Test_Int8(t *testing.T) {
 func Test_Int16(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":2,"Value":"4"}`
+	rawData := `{"Type":3,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -123,7 +179,7 @@ func Test_Int16(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt16 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":2,"Value":"nope"}`), tInt16)
+			err := json.Unmarshal([]byte(`{"Type":3,"Value":"nope"}`), tInt16)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int16"))
 		})
@@ -142,7 +198,7 @@ func Test_Int16(t *testing.T) {
 func Test_Int32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":3,"Value":"4"}`
+	rawData := `{"Type":4,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -166,7 +222,7 @@ func Test_Int32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":3,"Value":"nope"}`), tInt32)
+			err := json.Unmarshal([]byte(`{"Type":4,"Value":"nope"}`), tInt32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int32"))
 		})
@@ -185,7 +241,7 @@ func Test_Int32(t *testing.T) {
 func Test_Int64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":4,"Value":"4"}`
+	rawData := `{"Type":5,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -209,7 +265,7 @@ func Test_Int64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":4,"Value":"nope"}`), tInt64)
+			err := json.Unmarshal([]byte(`{"Type":5,"Value":"nope"}`), tInt64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int64"))
 		})
@@ -228,7 +284,7 @@ func Test_Int64(t *testing.T) {
 func Test_Uint(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":5,"Value":"4"}`
+	rawData := `{"Type":6,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -252,7 +308,7 @@ func Test_Uint(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":5,"Value":"nope"}`), tUint)
+			err := json.Unmarshal([]byte(`{"Type":6,"Value":"nope"}`), tUint)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint"))
 		})
@@ -271,7 +327,7 @@ func Test_Uint(t *testing.T) {
 func Test_Uint8(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":6,"Value":"4"}`
+	rawData := `{"Type":7,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -295,7 +351,7 @@ func Test_Uint8(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint8 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":6,"Value":"nope"}`), tUint8)
+			err := json.Unmarshal([]byte(`{"Type":7,"Value":"nope"}`), tUint8)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint8"))
 		})
@@ -314,7 +370,7 @@ func Test_Uint8(t *testing.T) {
 func Test_Uint16(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":7,"Value":"4"}`
+	rawData := `{"Type":8,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -338,7 +394,7 @@ func Test_Uint16(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint16 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":7,"Value":"nope"}`), tUint16)
+			err := json.Unmarshal([]byte(`{"Type":8,"Value":"nope"}`), tUint16)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint16"))
 		})
@@ -357,7 +413,7 @@ func Test_Uint16(t *testing.T) {
 func Test_Uint32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":8,"Value":"4"}`
+	rawData := `{"Type":9,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -381,7 +437,7 @@ func Test_Uint32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":8,"Value":"nope"}`), tUint32)
+			err := json.Unmarshal([]byte(`{"Type":9,"Value":"nope"}`), tUint32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint32"))
 		})
@@ -400,7 +456,7 @@ func Test_Uint32(t *testing.T) {
 func Test_Uint64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":9,"Value":"4"}`
+	rawData := `{"Type":10,"Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -424,7 +480,7 @@ func Test_Uint64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":9,"Value":"nope"}`), tUint64)
+			err := json.Unmarshal([]byte(`{"Type":10,"Value":"nope"}`), tUint64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint64"))
 		})
@@ -443,7 +499,7 @@ func Test_Uint64(t *testing.T) {
 func Test_Float32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":10,"Value":"4E+00"}`
+	rawData := `{"Type":11,"Value":"4E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -467,7 +523,7 @@ func Test_Float32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tFloat32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":10,"Value":"nope"}`), tFloat32)
+			err := json.Unmarshal([]byte(`{"Type":11,"Value":"nope"}`), tFloat32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float32"))
 		})
@@ -486,7 +542,7 @@ func Test_Float32(t *testing.T) {
 func Test_Float64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":11,"Value":"4E+00"}`
+	rawData := `{"Type":12,"Value":"4E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -510,7 +566,7 @@ func Test_Float64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tFloat64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":11,"Value":"nope"}`), tFloat64)
+			err := json.Unmarshal([]byte(`{"Type":12,"Value":"nope"}`), tFloat64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float64"))
 		})
@@ -529,7 +585,7 @@ func Test_Float64(t *testing.T) {
 func Test_String(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":12,"Value":"proper string"}`
+	rawData := `{"Type":13,"Value":"proper string"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -553,7 +609,7 @@ func Test_String(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tString := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":12,"Value":3}`), tString)
+			err := json.Unmarshal([]byte(`{"Type":13,"Value":3}`), tString)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("json: cannot unmarshal number into Go struct field .Value of type string"))
 		})
@@ -572,7 +628,7 @@ func Test_String(t *testing.T) {
 func Test_Bool(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":13,"Value":"true"}`
+	rawData := `{"Type":14,"Value":"true"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -596,7 +652,7 @@ func Test_Bool(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tBool := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":13,"Value":"nope"}`), tBool)
+			err := json.Unmarshal([]byte(`{"Type":14,"Value":"nope"}`), tBool)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert nope, to a bool"))
 		})
@@ -612,10 +668,10 @@ func Test_Bool(t *testing.T) {
 	})
 }
 
-func Test_CustomEncoderes(t *testing.T) {
+func Test_CustomCodec(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	t.Run("Describe overwritting default encoders", func(t *testing.T) {
+	t.Run("Describe codec set on the typedJSON", func(t *testing.T) {
 		codec := gotypedjson.CustomCodec{
 			gotypedjson.INT: {
 				Encode: func(val any) (string, error) {
@@ -637,21 +693,96 @@ func Test_CustomEncoderes(t *testing.T) {
 
 			data, err := tCustom.MarshalJSON()
 			g.Expect(err).ToNot(HaveOccurred())
-			g.Expect(string(data)).To(Equal(`{"Type":0,"Value":"10"}`))
+			g.Expect(string(data)).To(Equal(`{"Type":1,"Value":"10"}`))
 		})
 
-		// This kind of sucks. I don't want to use new here since a value should be nil from the server if nothing
-		// was sent. This kind of breaks that behavior...
-		//
-		// I can do it purely in "API" terms if I use a generic map[key name]TypedJson, but still I need to define
-		// all the keys up front with the decoders. This is tricky
 		t.Run("It can use the custom decoder", func(t *testing.T) {
 			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, codec)
 
-			err := json.Unmarshal([]byte(`{"Type":0,"Value":"10"}`), tCustom)
+			err := json.Unmarshal([]byte(`{"Type":1,"Value":"10"}`), tCustom)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
+			g.Expect(tCustom.Value.(int)).To(Equal(5))
+		})
+
+		t.Run("Context with GlobalCodec set", func(t *testing.T) {
+			gotypedjson.GlobalCodec = gotypedjson.CustomCodec{
+				gotypedjson.INT: gotypedjson.Codec{
+					Encode: func(val any) (string, error) { return "", fmt.Errorf("fail") },
+					Decode: func(s string) (any, error) { return nil, fmt.Errorf("fail") },
+				},
+			}
+
+			defer func() {
+				gotypedjson.GlobalCodec = nil
+			}()
+
+			t.Run("It uses the TypedJson codec", func(t *testing.T) {
+				tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, codec)
+
+				err := json.Unmarshal([]byte(`{"Type":1,"Value":"10"}`), tCustom)
+				g.Expect(err).ToNot(HaveOccurred())
+				g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
+				g.Expect(tCustom.Value.(int)).To(Equal(5))
+			})
+		})
+	})
+
+	t.Run("Dexcribe when the global codec is set", func(t *testing.T) {
+		gotypedjson.GlobalCodec = gotypedjson.CustomCodec{
+			gotypedjson.INT: {
+				Encode: func(val any) (string, error) {
+					return fmt.Sprintf("%d", val.(int)+5), nil
+				},
+				Decode: func(s string) (any, error) {
+					val, err := strconv.ParseInt(s, 10, 0)
+					if err != nil {
+						return nil, fmt.Errorf("failed to convert %s, to an int", s)
+					}
+
+					return int(val) - 5, nil
+				},
+			},
+		}
+
+		defer func() {
+			gotypedjson.GlobalCodec = nil
+		}()
+
+		t.Run("It can use the global encoder", func(t *testing.T) {
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 5, nil)
+
+			data, err := tCustom.MarshalJSON()
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(`{"Type":1,"Value":"10"}`))
+		})
+
+		t.Run("It can use the global decoder", func(t *testing.T) {
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, nil)
+
+			err := json.Unmarshal([]byte(`{"Type":1,"Value":"10"}`), tCustom)
 			g.Expect(err).ToNot(HaveOccurred())
 			g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
 			g.Expect(tCustom.Value.(int)).To(Equal(5))
 		})
 	})
+}
+
+func Test_OmitEmptyPreserved(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	testStruct := struct {
+		One *gotypedjson.TypedJson `json:"one,omitempty"`
+		Two *gotypedjson.TypedJson `json:"two,omitempty"`
+	}{}
+
+	rawJSON := `{"one":{"Type":1,"Value":"4"}}`
+
+	g.Expect(json.Unmarshal([]byte(rawJSON), &testStruct)).ToNot(HaveOccurred())
+	g.Expect(testStruct.One.Type).To(Equal(gotypedjson.INT))
+	g.Expect(testStruct.One.Value.(int)).To(Equal(4))
+
+	data, err := json.Marshal(testStruct)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(string(data)).To(Equal(rawJSON))
 }
