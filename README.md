@@ -24,21 +24,22 @@ raw data and trust the common JSON specification for how to treat string values 
 each Decode operation needs to parse the string value into its raw data type.
 
 
-Default JSONTYPE:
-* 	INT      = 1
-*	INT8     = 2
-*	INT16    = 3
-*	INT32    = 4
-*	INT64    = 5
-*	UINT     = 6
-*	UINT8    = 7
-*	UINT16   = 8
-*	UINT32   = 9
-*	UINT64   = 10
-*	FLOAT32  = 11
-*	FLOAT64  = 12
-*	STRING   = 13
-*	BOOL     = 14
+| JSONTYPE | Value |
+|:-- | :-- |
+| INT      | 1 |
+| INT8     | 2 |
+| INT16    | 3 |
+| INT32    | 4 |
+| INT64    | 5 |
+| UINT     | 6 |
+| UINT8    | 7 |
+| UINT16   | 8 |
+| UINT32   | 9 |
+| UINT64   | 10 |
+| FLOAT32  | 11 |
+| FLOAT64  | 12 |
+| STRING   | 13 |
+| BOOL     | 14 |
 
 NOTE that there is no 0 JSONTYPE. This is because objects initialization state is 0 and we don't have a way of 
 knowing unset vs JSONTYPE 0.
