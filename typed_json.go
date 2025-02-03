@@ -7,12 +7,10 @@ import (
 )
 
 // GlobalCodec is by default an unset codec that will be used to encode and decode all TypedJson
-// structs. This is usefult to set if all models follow the same encoding rules and you want to also
-// allow for the `json:"omitempty"` tags in golang. By default, setting CustomCodec on specific values
-// force Golang to treat the as some sort of set values. This global allows for preserving `omitempty` tags
-// which is useful when the JSON values are saved as part of a configuration
+// structs. This is usefult to set if all models follow the same encoding and decoding rules.
 var GlobalCodec CustomCodec = nil
 
+// JSONTYPE is the custom defintion used when determining the encoding / decoding structures
 type JSONTYPE int
 
 const (
@@ -62,30 +60,6 @@ type TypedJson struct {
 }
 
 //	PARAMETERS:
-//	* customCodec - (optional) codec that can be used for custom types, nil will just use the global and then default codec
-//
-//	RETURNS:
-//	* *TypedJson - json object that can encode/decode typed json
-//
-// Returns an Empty TypedJson with the custom codec set. This can panic if the custom codec is missing an encode
-// or decode function for any of the defined types
-func NewCodecJson(customCodec CustomCodec) *TypedJson {
-	for key, value := range customCodec {
-		if value.Encode == nil {
-			panic(fmt.Sprintf("key %d has a nil encoder", key))
-		}
-
-		if value.Decode == nil {
-			panic(fmt.Sprintf("key %d has a nil decoder", key))
-		}
-	}
-
-	return &TypedJson{
-		customCodec: customCodec,
-	}
-}
-
-//	PARAMETERS:
 //	* jsonType    - The Type associated with the Value
 //	* value       - Value that can be encoded and decoded consistently
 //	* customCodec - (optional) codec that can be used for custom types, nil will just use the global and then default codec
@@ -94,8 +68,7 @@ func NewCodecJson(customCodec CustomCodec) *TypedJson {
 //	* *TypedJson - json object that can encode/decode typed json
 //
 // Returns an initalized TypedJson with the optional typed custom codec set. This can panic if the custom codec is
-// missing an encode or decode function for any of the defined types. NOTE: this does not make any gurantess on they
-// jsonType and value parameters on assignment since they can be part of the overriden codec types.
+// missing an encode or decode function for any of the defined types. .
 func NewTypedJson(jsonType JSONTYPE, value any, customCodec CustomCodec) *TypedJson {
 	for key, value := range customCodec {
 		if value.Encode == nil {
@@ -126,7 +99,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 
 	typedJson.Type = temp.Type
 
-	// try the custom types
+	// try the custom codec types
 	if typedJson.customCodec != nil {
 		if encoder, ok := typedJson.customCodec[temp.Type]; ok {
 			val, err := encoder.Decode(temp.Value)
@@ -140,7 +113,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		}
 	}
 
-	// try the global types
+	// try the global codec types
 	if GlobalCodec != nil {
 		if encoder, ok := GlobalCodec[temp.Type]; ok {
 			val, err := encoder.Decode(temp.Value)
@@ -154,7 +127,7 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		}
 	}
 
-	// try the default types
+	// try the default codec types
 	switch temp.Type {
 	case INT:
 		val, err := strconv.ParseInt(temp.Value, 10, 0)

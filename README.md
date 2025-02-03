@@ -44,5 +44,31 @@ each Decode operation needs to parse the string value into its raw data type.
 NOTE that there is no 0 JSONTYPE. This is because objects initialization state is 0 and we don't have a way of 
 knowing unset vs JSONTYPE 0.
 
+## Adding your own data types
+
+There are a few ways to add your own encoding and decoding rules for custom types. The first and easiest way
+is to use the [Global Codec](#global-codec) if all possible Marhalers and Unmarshalers are going to use the same
+set of rules. Otherwise, using a [Custom Codec](#custom-coded) for individual `TypedJson` values will be easiest. This package does
+not provide specific rules for tagging `any or interface{}` types on how they should be encoded/decoded since its main
+goal is to accept arbitrary structures of unknow data.
+
+NOTE:
 If you want to define your own data types, I suggest starting at a much larger index `256`, just in case there are
 more data types added later, we don't conflict with each other
+
+#### Global Codec
+
+To override the global coded that is used by anyone that imports the same package, you can update the shared var
+```
+var GlobalCodec CustomCodec = nil
+```
+
+#### Custom Coded
+
+When using a known data types and structures that have specific rules for the model you are working with, you can instantiate objects
+with the `NewTypedJson` function. This allows for custome encoders to be attacked to `TypedJson` structures
+```
+func NewTypedJson(jsonType JSONTYPE, value any, customCodec CustomCodec) *TypedJson {
+	...
+}
+```

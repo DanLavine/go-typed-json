@@ -10,34 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_NewCodecJson(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	t.Run("It panics if a codec encode value is missing", func(t *testing.T) {
-		codec := gotypedjson.CustomCodec{
-			gotypedjson.BOOL: gotypedjson.Codec{
-				Encode: func(val any) (string, error) { return "", nil },
-			},
-		}
-
-		g.Expect(func() {
-			gotypedjson.NewCodecJson(codec)
-		}).To(Panic())
-	})
-
-	t.Run("It panics if a codec decode value is missing", func(t *testing.T) {
-		codec := gotypedjson.CustomCodec{
-			gotypedjson.BOOL: gotypedjson.Codec{
-				Decode: func(s string) (any, error) { return nil, nil },
-			},
-		}
-
-		g.Expect(func() {
-			gotypedjson.NewCodecJson(codec)
-		}).To(Panic())
-	})
-}
-
 func Test_NewTypedJson(t *testing.T) {
 	g := NewGomegaWithT(t)
 
