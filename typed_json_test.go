@@ -67,7 +67,7 @@ func Test_Int(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":1,"Value":"nope"}`), tInt)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -110,7 +110,7 @@ func Test_Int8(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":2,"Value":"nope"}`), tInt8)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int8"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int8"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -153,7 +153,7 @@ func Test_Int16(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":3,"Value":"nope"}`), tInt16)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int16"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int16"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -196,7 +196,7 @@ func Test_Int32(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":4,"Value":"nope"}`), tInt32)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int32"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int32"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -239,7 +239,7 @@ func Test_Int64(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":5,"Value":"nope"}`), tInt64)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to an int64"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int64"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -282,7 +282,7 @@ func Test_Uint(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":6,"Value":"nope"}`), tUint)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -325,7 +325,7 @@ func Test_Uint8(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":7,"Value":"nope"}`), tUint8)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint8"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint8"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -368,7 +368,7 @@ func Test_Uint16(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":8,"Value":"nope"}`), tUint16)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint16"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint16"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -411,7 +411,7 @@ func Test_Uint32(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":9,"Value":"nope"}`), tUint32)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint32"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint32"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -454,7 +454,7 @@ func Test_Uint64(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":10,"Value":"nope"}`), tUint64)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a uint64"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint64"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -497,7 +497,7 @@ func Test_Float32(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":11,"Value":"nope"}`), tFloat32)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float32"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a float32"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -540,7 +540,7 @@ func Test_Float64(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":12,"Value":"nope"}`), tFloat64)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a float64"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a float64"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -626,7 +626,7 @@ func Test_Bool(t *testing.T) {
 
 			err := json.Unmarshal([]byte(`{"Type":14,"Value":"nope"}`), tBool)
 			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("failed to convert nope, to a bool"))
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a bool"))
 		})
 
 		t.Run("It can decode the value properly", func(t *testing.T) {
@@ -636,6 +636,92 @@ func Test_Bool(t *testing.T) {
 			g.Expect(err).ToNot(HaveOccurred())
 			g.Expect(tBool.Type).To(Equal(gotypedjson.BOOL))
 			g.Expect(tBool.Value.(bool)).To(BeTrue())
+		})
+	})
+}
+
+func Test_Complex64(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":15,"Value":"(1E+00-3E+00i)"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tComplex64 := &gotypedjson.TypedJson{Type: gotypedjson.COMPLEX64, Value: "nope"}
+			data, err := json.Marshal(tComplex64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a complex64"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tComplex64 := &gotypedjson.TypedJson{Type: gotypedjson.COMPLEX64, Value: complex64(complex(float32(1.0), float32(-3.0)))}
+
+			data, err := json.Marshal(tComplex64)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tComplex64 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":15,"Value":"nope"}`), tComplex64)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a complex64"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tComplex64 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tComplex64)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tComplex64.Type).To(Equal(gotypedjson.COMPLEX64))
+			g.Expect(tComplex64.Value.(complex64)).To(Equal(complex64(complex(1, -3))))
+		})
+	})
+}
+
+func Test_Complex128(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawData := `{"Type":16,"Value":"(1E+00-3E+00i)"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tComplex128 := &gotypedjson.TypedJson{Type: gotypedjson.COMPLEX128, Value: "nope"}
+			data, err := json.Marshal(tComplex128)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a complex128"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tComplex128 := &gotypedjson.TypedJson{Type: gotypedjson.COMPLEX128, Value: complex(1.0, -3.0)}
+
+			data, err := json.Marshal(tComplex128)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawData))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tComplex128 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":16,"Value":"nope"}`), tComplex128)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a complex128"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tComplex128 := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawData), tComplex128)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tComplex128.Type).To(Equal(gotypedjson.COMPLEX128))
+			g.Expect(tComplex128.Value.(complex128)).To(Equal(complex(1, -3)))
 		})
 	})
 }

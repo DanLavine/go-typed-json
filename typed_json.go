@@ -14,20 +14,22 @@ var GlobalCodec CustomCodec = nil
 type JSONTYPE int
 
 const (
-	INT     JSONTYPE = 1
-	INT8    JSONTYPE = 2
-	INT16   JSONTYPE = 3
-	INT32   JSONTYPE = 4
-	INT64   JSONTYPE = 5
-	UINT    JSONTYPE = 6
-	UINT8   JSONTYPE = 7
-	UINT16  JSONTYPE = 8
-	UINT32  JSONTYPE = 9
-	UINT64  JSONTYPE = 10
-	FLOAT32 JSONTYPE = 11
-	FLOAT64 JSONTYPE = 12
-	STRING  JSONTYPE = 13
-	BOOL    JSONTYPE = 14
+	INT        JSONTYPE = 1
+	INT8       JSONTYPE = 2
+	INT16      JSONTYPE = 3
+	INT32      JSONTYPE = 4
+	INT64      JSONTYPE = 5
+	UINT       JSONTYPE = 6
+	UINT8      JSONTYPE = 7
+	UINT16     JSONTYPE = 8
+	UINT32     JSONTYPE = 9
+	UINT64     JSONTYPE = 10
+	FLOAT32    JSONTYPE = 11
+	FLOAT64    JSONTYPE = 12
+	STRING     JSONTYPE = 13
+	BOOL       JSONTYPE = 14
+	COMPLEX64  JSONTYPE = 15
+	COMPLEX128 JSONTYPE = 16
 )
 
 // Codec are used to Encode and Decode JSONTYPE data
@@ -55,7 +57,7 @@ type TypedJson struct {
 	// Values with the type associated for Type
 	Value any `json:"Value"`
 
-	// codec for just this strict
+	// codec for just this struct
 	customCodec CustomCodec
 }
 
@@ -132,73 +134,73 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 	case INT:
 		val, err := strconv.ParseInt(temp.Value, 10, 0)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to an int", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to an int", temp.Value)
 		}
 		typedJson.Value = int(val)
 	case INT8:
 		val, err := strconv.ParseInt(temp.Value, 10, 8)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to an int8", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to an int8", temp.Value)
 		}
 		typedJson.Value = int8(val)
 	case INT16:
 		val, err := strconv.ParseInt(temp.Value, 10, 16)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to an int16", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to an int16", temp.Value)
 		}
 		typedJson.Value = int16(val)
 	case INT32:
 		val, err := strconv.ParseInt(temp.Value, 10, 32)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to an int32", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to an int32", temp.Value)
 		}
 		typedJson.Value = int32(val)
 	case INT64:
 		val, err := strconv.ParseInt(temp.Value, 10, 64)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to an int64", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to an int64", temp.Value)
 		}
 		typedJson.Value = int64(val)
 	case UINT:
 		val, err := strconv.ParseUint(temp.Value, 10, 0)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a uint", temp.Value)
 		}
 		typedJson.Value = uint(val)
 	case UINT8:
 		val, err := strconv.ParseUint(temp.Value, 10, 8)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint8", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a uint8", temp.Value)
 		}
 		typedJson.Value = uint8(val)
 	case UINT16:
 		val, err := strconv.ParseUint(temp.Value, 10, 16)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint16", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a uint16", temp.Value)
 		}
 		typedJson.Value = uint16(val)
 	case UINT32:
 		val, err := strconv.ParseUint(temp.Value, 10, 32)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint32", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a uint32", temp.Value)
 		}
 		typedJson.Value = uint32(val)
 	case UINT64:
 		val, err := strconv.ParseUint(temp.Value, 10, 64)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a uint64", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a uint64", temp.Value)
 		}
 		typedJson.Value = uint64(val)
 	case FLOAT32:
 		val, err := strconv.ParseFloat(temp.Value, 32)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a float32", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a float32", temp.Value)
 		}
 		typedJson.Value = float32(val)
 	case FLOAT64:
 		val, err := strconv.ParseFloat(temp.Value, 64)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a float64", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a float64", temp.Value)
 		}
 		typedJson.Value = float64(val)
 	case STRING:
@@ -206,11 +208,23 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 	case BOOL:
 		val, err := strconv.ParseBool(temp.Value)
 		if err != nil {
-			return fmt.Errorf("failed to convert %s, to a bool", temp.Value)
+			return fmt.Errorf("failed to convert '%s' to a bool", temp.Value)
 		}
 		typedJson.Value = bool(val)
+	case COMPLEX64:
+		val, err := strconv.ParseComplex(temp.Value, 64)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a complex64", temp.Value)
+		}
+		typedJson.Value = complex64(val)
+	case COMPLEX128:
+		val, err := strconv.ParseComplex(temp.Value, 128)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a complex128", temp.Value)
+		}
+		typedJson.Value = val
 	default:
-		return fmt.Errorf("unknown type %d recevied for: %s", temp.Type, temp.Value)
+		return fmt.Errorf("unknown type '%d' recevied for: %s", temp.Type, temp.Value)
 	}
 
 	return nil
@@ -336,8 +350,20 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		}
 
 		temp.Value = strconv.FormatBool(typedJson.Value.(bool))
+	case COMPLEX64:
+		if _, ok := typedJson.Value.(complex64); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a complex64", typedJson.Value)
+		}
+
+		temp.Value = strconv.FormatComplex(complex128(typedJson.Value.(complex64)), 'E', -1, 64)
+	case COMPLEX128:
+		if _, ok := typedJson.Value.(complex128); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a complex128", typedJson.Value)
+		}
+
+		temp.Value = strconv.FormatComplex(typedJson.Value.(complex128), 'E', -1, 64)
 	default:
-		return nil, fmt.Errorf("unknow type to encode %d for %v", temp.Type, typedJson.Value)
+		return nil, fmt.Errorf("unknow type to encode %d for value: %v", temp.Type, typedJson.Value)
 	}
 
 	return json.Marshal(temp)
