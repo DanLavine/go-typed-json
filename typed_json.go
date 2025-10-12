@@ -1,9 +1,11 @@
 package gotypedjson
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // GlobalCodec is by default an unset codec that will be used to encode and decode all TypedJson
@@ -30,6 +32,23 @@ const (
 	BOOL       JSONTYPE = 14
 	COMPLEX64  JSONTYPE = 15
 	COMPLEX128 JSONTYPE = 16
+
+	INT_SLICE        JSONTYPE = 101
+	INT8_SLICE       JSONTYPE = 102
+	INT16_SLICE      JSONTYPE = 103
+	INT32_SLICE      JSONTYPE = 104
+	INT64_SLICE      JSONTYPE = 105
+	UINT_SLICE       JSONTYPE = 106
+	UINT8_SLICE      JSONTYPE = 107
+	UINT16_SLICE     JSONTYPE = 108
+	UINT32_SLICE     JSONTYPE = 109
+	UINT64_SLICE     JSONTYPE = 110
+	FLOAT32_SLICE    JSONTYPE = 111
+	FLOAT64_SLICE    JSONTYPE = 112
+	STRING_SLICE     JSONTYPE = 113
+	BOOL_SLICE       JSONTYPE = 114
+	COMPLEX64_SLICE  JSONTYPE = 115
+	COMPLEX128_SLICE JSONTYPE = 116
 )
 
 // Codec are used to Encode and Decode JSONTYPE data
@@ -223,8 +242,310 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 			return fmt.Errorf("failed to convert '%s' to a complex128", temp.Value)
 		}
 		typedJson.Value = val
+	case INT_SLICE:
+		tmp := []int{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseInt(string(decodedValue), 10, 0)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int", string(decodedValue))
+				}
+
+				tmp = append(tmp, int(val))
+			}
+
+			typedJson.Value = tmp
+		}
+
+		typedJson.Value = tmp
+
+	case INT8_SLICE:
+		tmp := []int8{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseInt(string(decodedValue), 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int8", string(decodedValue))
+				}
+
+				tmp = append(tmp, int8(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT16_SLICE:
+		tmp := []int16{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseInt(string(decodedValue), 10, 16)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int16", string(decodedValue))
+				}
+
+				tmp = append(tmp, int16(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT32_SLICE:
+		tmp := []int32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseInt(string(decodedValue), 10, 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int32", string(decodedValue))
+				}
+
+				tmp = append(tmp, int32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT64_SLICE:
+		tmp := []int64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseInt(string(decodedValue), 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int64", string(decodedValue))
+				}
+
+				tmp = append(tmp, int64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT_SLICE:
+		tmp := []uint{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseUint(string(decodedValue), 10, 0)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint", string(decodedValue))
+				}
+
+				tmp = append(tmp, uint(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT8_SLICE:
+		tmp := []uint8{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseUint(string(decodedValue), 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint8", string(decodedValue))
+				}
+
+				tmp = append(tmp, uint8(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT16_SLICE:
+		tmp := []uint16{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseUint(string(decodedValue), 10, 16)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint16", string(decodedValue))
+				}
+
+				tmp = append(tmp, uint16(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT32_SLICE:
+		tmp := []uint32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseUint(string(decodedValue), 10, 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint32", string(decodedValue))
+				}
+
+				tmp = append(tmp, uint32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT64_SLICE:
+		tmp := []uint64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseUint(string(decodedValue), 10, 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint64", string(decodedValue))
+				}
+
+				tmp = append(tmp, uint64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case FLOAT32_SLICE:
+		tmp := []float32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseFloat(string(decodedValue), 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a float32", string(decodedValue))
+				}
+
+				tmp = append(tmp, float32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case FLOAT64_SLICE:
+		tmp := []float64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseFloat(string(decodedValue), 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a float64", string(decodedValue))
+				}
+
+				tmp = append(tmp, float64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case STRING_SLICE:
+		tmp := []string{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				tmp = append(tmp, string(decodedValue))
+			}
+		}
+
+		typedJson.Value = tmp
+	case BOOL_SLICE:
+		tmp := []bool{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseBool(string(decodedValue))
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a bool", string(decodedValue))
+				}
+
+				tmp = append(tmp, val)
+			}
+		}
+
+		typedJson.Value = tmp
+	case COMPLEX64_SLICE:
+		tmp := []complex64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseComplex(string(decodedValue), 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a complex64", string(decodedValue))
+				}
+
+				tmp = append(tmp, complex64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case COMPLEX128_SLICE:
+		tmp := []complex128{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				val, err := strconv.ParseComplex(string(decodedValue), 128)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a complex128", string(decodedValue))
+				}
+
+				tmp = append(tmp, val)
+			}
+		}
+
+		typedJson.Value = tmp
 	default:
-		return fmt.Errorf("unknown type '%d' recevied for: %s", temp.Type, temp.Value)
+		return fmt.Errorf("unknown type '%d' to decode", temp.Type)
 	}
 
 	return nil
@@ -362,8 +683,280 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		}
 
 		temp.Value = strconv.FormatComplex(typedJson.Value.(complex128), 'E', -1, 64)
+	case INT_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]int); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []int", typedJson.Value)
+			}
+		}
+	case INT8_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]int8); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []int8", typedJson.Value)
+			}
+		}
+	case INT16_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]int16); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []int16", typedJson.Value)
+			}
+		}
+	case INT32_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]int32); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []int32", typedJson.Value)
+			}
+		}
+	case INT64_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]int64); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(value, 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []int64", typedJson.Value)
+			}
+		}
+	case UINT_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]uint); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []uint", typedJson.Value)
+			}
+		}
+	case UINT8_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]uint8); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []uint8", typedJson.Value)
+			}
+		}
+	case UINT16_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]uint16); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []uint16", typedJson.Value)
+			}
+		}
+	case UINT32_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]uint32); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []uint32", typedJson.Value)
+			}
+		}
+	case UINT64_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]uint64); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []uint64", typedJson.Value)
+			}
+		}
+	case FLOAT32_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]float32); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatFloat(float64(value), 'E', -1, 32)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []float32", typedJson.Value)
+			}
+		}
+	case FLOAT64_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]float64); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatFloat(value, 'E', -1, 64)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []float64", typedJson.Value)
+			}
+		}
+	case STRING_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]string); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(value))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []string", typedJson.Value)
+			}
+		}
+	case BOOL_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]bool); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatBool(value)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []bool", typedJson.Value)
+			}
+		}
+	case COMPLEX64_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]complex64); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatComplex(complex128(value), 'E', -1, 64)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []complex64", typedJson.Value)
+			}
+		}
+	case COMPLEX128_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]complex128); ok {
+				for index, value := range values {
+					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatComplex(value, 'E', -1, 64)))
+					if index == 0 {
+						temp.Value = str
+					} else {
+						temp.Value += "," + str
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []complex128", typedJson.Value)
+			}
+		}
 	default:
-		return nil, fmt.Errorf("unknow type to encode %d for value: %v", temp.Type, typedJson.Value)
+		return nil, fmt.Errorf("unknow type '%d' to encode", temp.Type)
 	}
 
 	return json.Marshal(temp)

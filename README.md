@@ -24,24 +24,40 @@ raw data and trust the common JSON specification for how to treat string values 
 each Decode operation needs to parse the string value into its raw data type.
 
 
-| JSONTYPE   | Value |
-|:--         | :-- |
-| INT        | 1 |
-| INT8       | 2 |
-| INT16      | 3 |
-| INT32      | 4 |
-| INT64      | 5 |
-| UINT       | 6 |
-| UINT8      | 7 |
-| UINT16     | 8 |
-| UINT32     | 9 |
-| UINT64     | 10 |
-| FLOAT32    | 11 |
-| FLOAT64    | 12 |
-| STRING     | 13 |
-| BOOL       | 14 |
-| COMPLEX64  | 15 |
-| COMPLEX128 | 16 |
+| JSONTYPE     | Value |
+|:--           | :-- |
+| INT          | 1 |
+| INT8         | 2 |
+| INT16        | 3 |
+| INT32        | 4 |
+| INT64        | 5 |
+| UINT         | 6 |
+| UINT8        | 7 |
+| UINT16       | 8 |
+| UINT32       | 9 |
+| UINT64       | 10 |
+| FLOAT32      | 11 |
+| FLOAT64      | 12 |
+| STRING       | 13 |
+| BOOL         | 14 |
+| COMPLEX64    | 15 |
+| COMPLEX128   | 16 |
+| []INT        | 101 |
+| []INT8       | 102 |
+| []INT16      | 103 |
+| []INT32      | 104 |
+| []INT64      | 105 |
+| []UINT       | 106 |
+| []UINT8      | 107 |
+| []UINT16     | 108 |
+| []UINT32     | 109 |
+| []UINT64     | 110 |
+| []FLOAT32    | 111 |
+| []FLOAT64    | 112 |
+| []STRING     | 113 |
+| []BOOL       | 114 |
+| []COMPLEX64  | 115 |
+| []COMPLEX128 | 116 |
 
 NOTE that there is no 0 JSONTYPE. This is because objects initialization state is 0 and we don't have a way of 
 knowing unset vs JSONTYPE 0.
