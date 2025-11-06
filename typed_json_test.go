@@ -1946,6 +1946,172 @@ func Test_Bool_Slice(t *testing.T) {
 	})
 }
 
+func Test_DateTime_Slice(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	timeOne := time.Now()
+	timeTwo := time.Now()
+
+	rawDataEmpty := `{"Type":"_datetime_array","Value":""}`
+	rawDataSingle := fmt.Sprintf(`{"Type":"_datetime_array","Value":"%s"}`, timeOne.Format(time.RFC3339))
+	rawDataMulti := fmt.Sprintf(`{"Type":"_datetime_array","Value":"%s,%s"}`, timeOne.Format(time.RFC3339), timeTwo.Format(time.RFC3339))
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: "nope"}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a []datetime"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode an empty slice", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: nil}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataEmpty))
+		})
+
+		t.Run("It can encode a single value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: []time.Time{timeOne}}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataSingle))
+		})
+
+		t.Run("It can encode multiple value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: []time.Time{timeOne, timeTwo}}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataMulti))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an invalid value", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_datetime_array","Value":"hello"}`), tDateTimeS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a datetime"))
+		})
+
+		t.Run("It can decode an empty slice", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataEmpty), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(tDateTimeS.Value.([]time.Time)).To(Equal([]time.Time{}))
+		})
+
+		t.Run("It can decode a single value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataSingle), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(len(tDateTimeS.Value.(([]time.Time)))).To(Equal(1))
+			g.Expect(tDateTimeS.Value.([]time.Time)[0].Format(time.RFC3339)).To(Equal(timeOne.Format(time.RFC3339)))
+		})
+
+		t.Run("It can decode multiple values properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataMulti), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(len(tDateTimeS.Value.(([]time.Time)))).To(Equal(2))
+			g.Expect(tDateTimeS.Value.([]time.Time)[0].Format(time.RFC3339)).To(Equal(timeOne.Format(time.RFC3339)))
+			g.Expect(tDateTimeS.Value.([]time.Time)[1].Format(time.RFC3339)).To(Equal(timeTwo.Format(time.RFC3339)))
+		})
+	})
+}
+
+func Test_Duration_Slice(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawDataEmpty := `{"Type":"_duration_array","Value":""}`
+	rawDataSingle := `{"Type":"_duration_array","Value":"2s"}`
+	rawDataMulti := `{"Type":"_duration_array","Value":"2s,3ms"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: "nope"}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a []duration"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode an empty slice", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: nil}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataEmpty))
+		})
+
+		t.Run("It can encode a single value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: []time.Duration{2 * time.Second}}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataSingle))
+		})
+
+		t.Run("It can encode multiple value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: []time.Duration{2 * time.Second, 3 * time.Millisecond}}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataMulti))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an invalid value", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_duration_array","Value":"hello"}`), tDurationS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a duration"))
+		})
+
+		t.Run("It can decode an empty slice", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataEmpty), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.([]time.Duration)).To(Equal([]time.Duration{}))
+		})
+
+		t.Run("It can decode a single value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataSingle), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.(([]time.Duration))).To(Equal([]time.Duration{2 * time.Second}))
+		})
+
+		t.Run("It can decode multiple values properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataMulti), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.(([]time.Duration))).To(Equal([]time.Duration{2 * time.Second, 3 * time.Millisecond}))
+		})
+	})
+}
+
 func Test_Complex64_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 

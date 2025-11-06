@@ -38,20 +38,23 @@ const (
 	COMPLEX128    JSONTYPE = "_complex128"
 
 	// slice objects, but we will call them arrays
-	INT_SLICE        JSONTYPE = "_int_array"
-	INT8_SLICE       JSONTYPE = "_int8_array"
-	INT16_SLICE      JSONTYPE = "_int16_array"
-	INT32_SLICE      JSONTYPE = "_int32_array"
-	INT64_SLICE      JSONTYPE = "_int64_array"
-	UINT_SLICE       JSONTYPE = "_uint_array"
-	UINT8_SLICE      JSONTYPE = "_uint8_array"
-	UINT16_SLICE     JSONTYPE = "_uint16_array"
-	UINT32_SLICE     JSONTYPE = "_uint32_array"
-	UINT64_SLICE     JSONTYPE = "_uint64_array"
-	FLOAT32_SLICE    JSONTYPE = "_float32_array"
-	FLOAT64_SLICE    JSONTYPE = "_float64_array"
-	STRING_SLICE     JSONTYPE = "_string_array"
-	BOOL_SLICE       JSONTYPE = "_bool_array"
+	INT_SLICE           JSONTYPE = "_int_array"
+	INT8_SLICE          JSONTYPE = "_int8_array"
+	INT16_SLICE         JSONTYPE = "_int16_array"
+	INT32_SLICE         JSONTYPE = "_int32_array"
+	INT64_SLICE         JSONTYPE = "_int64_array"
+	UINT_SLICE          JSONTYPE = "_uint_array"
+	UINT8_SLICE         JSONTYPE = "_uint8_array"
+	UINT16_SLICE        JSONTYPE = "_uint16_array"
+	UINT32_SLICE        JSONTYPE = "_uint32_array"
+	UINT64_SLICE        JSONTYPE = "_uint64_array"
+	FLOAT32_SLICE       JSONTYPE = "_float32_array"
+	FLOAT64_SLICE       JSONTYPE = "_float64_array"
+	STRING_SLICE        JSONTYPE = "_string_array"
+	BOOL_SLICE          JSONTYPE = "_bool_array"
+	DATETIME_SLICE      JSONTYPE = "_datetime_array"
+	TIME_DURATION_SLICE JSONTYPE = "_duration_array"
+
 	COMPLEX64_SLICE  JSONTYPE = "_complex64_array"
 	COMPLEX128_SLICE JSONTYPE = "_complex128_array"
 )
@@ -507,6 +510,38 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 				return nil, fmt.Errorf("failed to cast '%v' to a []bool", typedJson.Value)
 			}
 		}
+	case DATETIME_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]time.Time); ok {
+				for index, value := range values {
+					if index == 0 {
+						temp.Value = value.Format(time.RFC3339)
+					} else {
+						temp.Value += fmt.Sprintf(",%s", value.Format(time.RFC3339))
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []datetime", typedJson.Value)
+			}
+		}
+	case TIME_DURATION_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]time.Duration); ok {
+				for index, value := range values {
+					if index == 0 {
+						temp.Value = value.String()
+					} else {
+						temp.Value += fmt.Sprintf(",%s", value.String())
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []duration", typedJson.Value)
+			}
+		}
 	case COMPLEX64_SLICE:
 		if typedJson.Value == nil {
 			temp.Value = ""
@@ -708,7 +743,6 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 		}
 
 		typedJson.Value = tmp
-
 	case INT8_SLICE:
 		tmp := []int8{}
 		if temp.Value != "" {
@@ -888,6 +922,38 @@ func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
 
 				tmp = append(tmp, val)
 			}
+		}
+
+		typedJson.Value = tmp
+	case DATETIME_SLICE:
+		tmp := []time.Time{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := time.Parse(time.RFC3339, value)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a datetime", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+
+			typedJson.Value = tmp
+		}
+
+		typedJson.Value = tmp
+	case TIME_DURATION_SLICE:
+		tmp := []time.Duration{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := time.ParseDuration(value)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a duration", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+
+			typedJson.Value = tmp
 		}
 
 		typedJson.Value = tmp
