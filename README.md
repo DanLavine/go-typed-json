@@ -19,48 +19,48 @@ type TypedJson struct {
 }
 ```
 
-and when encoding any of the JSONTYPE's Values, we convert them to a string. This way we can preserve the object's
+When encoding any of the JSONTYPE's Values, we convert them to a string. This way we can preserve the object's
 raw data and trust the common JSON specification for how to treat string values when sending them. Then
 each Decode operation needs to parse the string value into its raw data type.
 
-
-| JSONTYPE     | Value |
-|:--           | :-- |
-| INT          | 1 |
-| INT8         | 2 |
-| INT16        | 3 |
-| INT32        | 4 |
-| INT64        | 5 |
-| UINT         | 6 |
-| UINT8        | 7 |
-| UINT16       | 8 |
-| UINT32       | 9 |
-| UINT64       | 10 |
-| FLOAT32      | 11 |
-| FLOAT64      | 12 |
-| STRING       | 13 |
-| BOOL         | 14 |
-| COMPLEX64    | 15 |
-| COMPLEX128   | 16 |
-| []INT        | 101 |
-| []INT8       | 102 |
-| []INT16      | 103 |
-| []INT32      | 104 |
-| []INT64      | 105 |
-| []UINT       | 106 |
-| []UINT8      | 107 |
-| []UINT16     | 108 |
-| []UINT32     | 109 |
-| []UINT64     | 110 |
-| []FLOAT32    | 111 |
-| []FLOAT64    | 112 |
-| []STRING     | 113 |
-| []BOOL       | 114 |
-| []COMPLEX64  | 115 |
-| []COMPLEX128 | 116 |
-
-NOTE that there is no 0 JSONTYPE. This is because objects initialization state is 0 and we don't have a way of 
-knowing unset vs JSONTYPE 0.
+| JSONTYPE         | Value               | Details                                                                                            |
+|:--               | :--                 | :--                                                                                                |
+| INT              | "_int"              | signed 8 bytes                                                                                     |
+| INT8             | "_int8"             | signed 1 byte                                                                                      |
+| INT16            | "_int16"            | signed 2 bytes                                                                                     |
+| INT32            | "_int32"            | signed 4 bytes                                                                                     |
+| INT64            | "_int64"            | signed 8 bytes                                                                                     |
+| UINT             | "_uint"             | unsigned 8 bytes                                                                                   |
+| UINT8            | "_uint8"            | unsigned 1 byte                                                                                    |
+| UINT16           | "_uint16"           | unsigned 2 bytes                                                                                   |
+| UINT32           | "_uint32"           | unsigned 4 bytes                                                                                   |
+| UINT64           | "_uint64"           | unsigned 8 bytes                                                                                   |
+| FLOAT32          | "_float32"          | (IEEE 754 32-bit floating-point numbers)                                                           |
+| FLOAT64          | "_float64"          | (IEEE 754 64-bit floating-point numbers)                                                           |
+| STRING           | "_string"           | utf8 encoded string                                                                                |
+| BOOL             | "_bool"             | `true` or `false`                                                                                  |
+| DATETIME         | "_datetime"         | RFC3339 string encoded datetime                                                                    |
+| DURATION         | "_duration"         | string format https://pkg.go.dev/time#ParseDuration                                                |
+| COMPLEX64        | "_complex64"        | string of complex numbers https://go.dev/play/p/hyTDeE84G5y                                        |
+| COMPLEX128       | "_complex128"       | string of complex numbers https://go.dev/play/p/JohwkAq58BE                                        |
+| INT_SLICE        | "_int_slice"        | list of `,` seperated strings of type: signed 8 bytes                                              |
+| INT8_SLICE       | "_int8_slice"       | list of `,` seperated strings of type: signed 1 byte                                               |
+| INT16_SLICE      | "_int16_slice"      | list of `,` seperated strings of type: signed 2 bytes                                              |
+| INT32_SLICE      | "_int32_slice"      | list of `,` seperated strings of type: signed 4 bytes                                              |
+| INT64_SLICE      | "_int64_slice"      | list of `,` seperated strings of type: signed 8 bytes                                              |
+| UINT_SLICE       | "_uint_slice"       | list of `,` seperated strings of type: unsigned 8 bytes                                            |
+| UINT8_SLICE      | "_uint8_slice"      | list of `,` seperated strings of type: unsigned 1 byte                                             |
+| UINT16_SLICE     | "_uint16_slice"     | list of `,` seperated strings of type: unsigned 2 bytes                                            |
+| UINT32_SLICE     | "_uint32_slice"     | list of `,` seperated strings of type: unsigned 4 bytes                                            |
+| UINT64_SLICE     | "_uint64_slice"     | list of `,` seperated strings of type: unsigned 8 bytes                                            |
+| FLOAT32_SLICE    | "_float32_slice"    | list of `,` seperated strings of type: (IEEE 754 32-bit floating-point numbers)                    |
+| FLOAT64_SLICE    | "_float64_slice"    | list of `,` seperated strings of type: (IEEE 754 64-bit floating-point numbers)                    |
+| STRING_SLICE     | "_string_slice"     | list of `,` seperated strings of type: base64 encoded utf8 string                                         |
+| BOOL_SLICE       | "_bool_slice"       | list of `,` seperated strings of type: `true` or `false`                                           |
+| DATETIME_SLICE   | "_datetime_slice"   | list of `,` seperated strings of type: RFC3339 string encoded datetime                             |
+| DURATION_SLICE   | "_duration_slice"   | list of `,` seperated strings of type: string format https://pkg.go.dev/time#ParseDuration         |
+| COMPLEX64_SLICE  | "_complex64_slice"  | list of `,` seperated strings of type: string of complex numbers https://go.dev/play/p/9Dz12hWk8yp |
+| COMPLEX128_SLICE | "_complex128_slice" | list of `,` seperated strings of type: string of complex numbers https://go.dev/play/p/I0CpIXk5O32 |
 
 ## Adding your own data types
 
@@ -71,8 +71,8 @@ not provide specific rules for tagging `any or interface{}` types on how they sh
 goal is to accept arbitrary structures of unknow data.
 
 NOTE:
-If you want to define your own data types, I suggest starting at a much larger index `1024`, just in case there are
-more data types added later, we don't conflict with each other
+Go-Typed-JSON reserves all key words begining with an `_`. This allows the packages to add any addition built in data
+types, all prefiexed with a `_`.. 
 
 #### Global Codec
 
