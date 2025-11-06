@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // GlobalCodec is by default an unset codec that will be used to encode and decode all TypedJson
@@ -13,42 +14,49 @@ import (
 var GlobalCodec CustomCodec = nil
 
 // JSONTYPE is the custom defintion used when determining the encoding / decoding structures
-type JSONTYPE int
+type JSONTYPE string
 
 const (
-	INT        JSONTYPE = 1
-	INT8       JSONTYPE = 2
-	INT16      JSONTYPE = 3
-	INT32      JSONTYPE = 4
-	INT64      JSONTYPE = 5
-	UINT       JSONTYPE = 6
-	UINT8      JSONTYPE = 7
-	UINT16     JSONTYPE = 8
-	UINT32     JSONTYPE = 9
-	UINT64     JSONTYPE = 10
-	FLOAT32    JSONTYPE = 11
-	FLOAT64    JSONTYPE = 12
-	STRING     JSONTYPE = 13
-	BOOL       JSONTYPE = 14
-	COMPLEX64  JSONTYPE = 15
-	COMPLEX128 JSONTYPE = 16
+	// go types
+	INT           JSONTYPE = "_int"
+	INT8          JSONTYPE = "_int8"
+	INT16         JSONTYPE = "_int16"
+	INT32         JSONTYPE = "_int32"
+	INT64         JSONTYPE = "_int64"
+	UINT          JSONTYPE = "_uint"
+	UINT8         JSONTYPE = "_uint8"
+	UINT16        JSONTYPE = "_uint16"
+	UINT32        JSONTYPE = "_uint32"
+	UINT64        JSONTYPE = "_uint64"
+	FLOAT32       JSONTYPE = "_float32"
+	FLOAT64       JSONTYPE = "_float64"
+	STRING        JSONTYPE = "_string"
+	BOOL          JSONTYPE = "_bool"
+	DATETIME      JSONTYPE = "_datetime"
+	TIME_DURATION JSONTYPE = "_duration"
+	COMPLEX64     JSONTYPE = "_complex64"
+	COMPLEX128    JSONTYPE = "_complex128"
 
-	INT_SLICE        JSONTYPE = 101
-	INT8_SLICE       JSONTYPE = 102
-	INT16_SLICE      JSONTYPE = 103
-	INT32_SLICE      JSONTYPE = 104
-	INT64_SLICE      JSONTYPE = 105
-	UINT_SLICE       JSONTYPE = 106
-	UINT8_SLICE      JSONTYPE = 107
-	UINT16_SLICE     JSONTYPE = 108
-	UINT32_SLICE     JSONTYPE = 109
-	UINT64_SLICE     JSONTYPE = 110
-	FLOAT32_SLICE    JSONTYPE = 111
-	FLOAT64_SLICE    JSONTYPE = 112
-	STRING_SLICE     JSONTYPE = 113
-	BOOL_SLICE       JSONTYPE = 114
-	COMPLEX64_SLICE  JSONTYPE = 115
-	COMPLEX128_SLICE JSONTYPE = 116
+	// slice objects, but we will call them arrays
+	INT_SLICE           JSONTYPE = "_int_array"
+	INT8_SLICE          JSONTYPE = "_int8_array"
+	INT16_SLICE         JSONTYPE = "_int16_array"
+	INT32_SLICE         JSONTYPE = "_int32_array"
+	INT64_SLICE         JSONTYPE = "_int64_array"
+	UINT_SLICE          JSONTYPE = "_uint_array"
+	UINT8_SLICE         JSONTYPE = "_uint8_array"
+	UINT16_SLICE        JSONTYPE = "_uint16_array"
+	UINT32_SLICE        JSONTYPE = "_uint32_array"
+	UINT64_SLICE        JSONTYPE = "_uint64_array"
+	FLOAT32_SLICE       JSONTYPE = "_float32_array"
+	FLOAT64_SLICE       JSONTYPE = "_float64_array"
+	STRING_SLICE        JSONTYPE = "_string_array"
+	BOOL_SLICE          JSONTYPE = "_bool_array"
+	DATETIME_SLICE      JSONTYPE = "_datetime_array"
+	TIME_DURATION_SLICE JSONTYPE = "_duration_array"
+
+	COMPLEX64_SLICE  JSONTYPE = "_complex64_array"
+	COMPLEX128_SLICE JSONTYPE = "_complex128_array"
 )
 
 // Codec are used to Encode and Decode JSONTYPE data
@@ -89,15 +97,15 @@ type TypedJson struct {
 //	* *TypedJson - json object that can encode/decode typed json
 //
 // Returns an initalized TypedJson with the optional typed custom codec set. This can panic if the custom codec is
-// missing an encode or decode function for any of the defined types. .
+// missing an encode or decode function for any of the defined types.
 func NewTypedJson(jsonType JSONTYPE, value any, customCodec CustomCodec) *TypedJson {
 	for key, value := range customCodec {
 		if value.Encode == nil {
-			panic(fmt.Sprintf("key %d has a nil encoder", key))
+			panic(fmt.Sprintf("key %s has a nil encoder", key))
 		}
 
 		if value.Decode == nil {
-			panic(fmt.Sprintf("key %d has a nil decoder", key))
+			panic(fmt.Sprintf("key %s has a nil decoder", key))
 		}
 	}
 
@@ -108,447 +116,29 @@ func NewTypedJson(jsonType JSONTYPE, value any, customCodec CustomCodec) *TypedJ
 	}
 }
 
-func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
-	temp := &struct {
-		Type  JSONTYPE `json:"Type"`
-		Value string   `json:"Value"`
-	}{}
+//	PARAMETERS:
+//	* customCodec - (optional) codec that can be used for custom types, nil will just use the global and then default codec
+//
+//	RETURNS:
+//	* *TypedJson - json object that can encode/decode typed json
+//
+// Returns a TypedJson object that can make use of the customCodec when calling the `json.Unamarshal(...)` operation
+// without making any assumtions about the expected type or value. This can panic if the custom codec is missing an
+// encode or decode function for any of the defined types.
+func NewTypedJsonDecoder(customCodec CustomCodec) *TypedJson {
+	for key, value := range customCodec {
+		if value.Encode == nil {
+			panic(fmt.Sprintf("key %s has a nil encoder", key))
+		}
 
-	if err := json.Unmarshal(b, temp); err != nil {
-		return err
-	}
-
-	typedJson.Type = temp.Type
-
-	// try the custom codec types
-	if typedJson.customCodec != nil {
-		if encoder, ok := typedJson.customCodec[temp.Type]; ok {
-			val, err := encoder.Decode(temp.Value)
-			if err != nil {
-				return err
-			}
-
-			typedJson.Value = val
-
-			return nil
+		if value.Decode == nil {
+			panic(fmt.Sprintf("key %s has a nil decoder", key))
 		}
 	}
 
-	// try the global codec types
-	if GlobalCodec != nil {
-		if encoder, ok := GlobalCodec[temp.Type]; ok {
-			val, err := encoder.Decode(temp.Value)
-			if err != nil {
-				return err
-			}
-
-			typedJson.Value = val
-
-			return nil
-		}
+	return &TypedJson{
+		customCodec: customCodec,
 	}
-
-	// try the default codec types
-	switch temp.Type {
-	case INT:
-		val, err := strconv.ParseInt(temp.Value, 10, 0)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to an int", temp.Value)
-		}
-		typedJson.Value = int(val)
-	case INT8:
-		val, err := strconv.ParseInt(temp.Value, 10, 8)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to an int8", temp.Value)
-		}
-		typedJson.Value = int8(val)
-	case INT16:
-		val, err := strconv.ParseInt(temp.Value, 10, 16)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to an int16", temp.Value)
-		}
-		typedJson.Value = int16(val)
-	case INT32:
-		val, err := strconv.ParseInt(temp.Value, 10, 32)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to an int32", temp.Value)
-		}
-		typedJson.Value = int32(val)
-	case INT64:
-		val, err := strconv.ParseInt(temp.Value, 10, 64)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to an int64", temp.Value)
-		}
-		typedJson.Value = int64(val)
-	case UINT:
-		val, err := strconv.ParseUint(temp.Value, 10, 0)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a uint", temp.Value)
-		}
-		typedJson.Value = uint(val)
-	case UINT8:
-		val, err := strconv.ParseUint(temp.Value, 10, 8)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a uint8", temp.Value)
-		}
-		typedJson.Value = uint8(val)
-	case UINT16:
-		val, err := strconv.ParseUint(temp.Value, 10, 16)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a uint16", temp.Value)
-		}
-		typedJson.Value = uint16(val)
-	case UINT32:
-		val, err := strconv.ParseUint(temp.Value, 10, 32)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a uint32", temp.Value)
-		}
-		typedJson.Value = uint32(val)
-	case UINT64:
-		val, err := strconv.ParseUint(temp.Value, 10, 64)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a uint64", temp.Value)
-		}
-		typedJson.Value = uint64(val)
-	case FLOAT32:
-		val, err := strconv.ParseFloat(temp.Value, 32)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a float32", temp.Value)
-		}
-		typedJson.Value = float32(val)
-	case FLOAT64:
-		val, err := strconv.ParseFloat(temp.Value, 64)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a float64", temp.Value)
-		}
-		typedJson.Value = float64(val)
-	case STRING:
-		typedJson.Value = string(temp.Value)
-	case BOOL:
-		val, err := strconv.ParseBool(temp.Value)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a bool", temp.Value)
-		}
-		typedJson.Value = bool(val)
-	case COMPLEX64:
-		val, err := strconv.ParseComplex(temp.Value, 64)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a complex64", temp.Value)
-		}
-		typedJson.Value = complex64(val)
-	case COMPLEX128:
-		val, err := strconv.ParseComplex(temp.Value, 128)
-		if err != nil {
-			return fmt.Errorf("failed to convert '%s' to a complex128", temp.Value)
-		}
-		typedJson.Value = val
-	case INT_SLICE:
-		tmp := []int{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseInt(string(decodedValue), 10, 0)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to an int", string(decodedValue))
-				}
-
-				tmp = append(tmp, int(val))
-			}
-
-			typedJson.Value = tmp
-		}
-
-		typedJson.Value = tmp
-
-	case INT8_SLICE:
-		tmp := []int8{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseInt(string(decodedValue), 10, 8)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to an int8", string(decodedValue))
-				}
-
-				tmp = append(tmp, int8(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case INT16_SLICE:
-		tmp := []int16{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseInt(string(decodedValue), 10, 16)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to an int16", string(decodedValue))
-				}
-
-				tmp = append(tmp, int16(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case INT32_SLICE:
-		tmp := []int32{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseInt(string(decodedValue), 10, 32)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to an int32", string(decodedValue))
-				}
-
-				tmp = append(tmp, int32(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case INT64_SLICE:
-		tmp := []int64{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseInt(string(decodedValue), 10, 8)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to an int64", string(decodedValue))
-				}
-
-				tmp = append(tmp, int64(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case UINT_SLICE:
-		tmp := []uint{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseUint(string(decodedValue), 10, 0)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a uint", string(decodedValue))
-				}
-
-				tmp = append(tmp, uint(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case UINT8_SLICE:
-		tmp := []uint8{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseUint(string(decodedValue), 10, 8)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a uint8", string(decodedValue))
-				}
-
-				tmp = append(tmp, uint8(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case UINT16_SLICE:
-		tmp := []uint16{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseUint(string(decodedValue), 10, 16)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a uint16", string(decodedValue))
-				}
-
-				tmp = append(tmp, uint16(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case UINT32_SLICE:
-		tmp := []uint32{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseUint(string(decodedValue), 10, 32)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a uint32", string(decodedValue))
-				}
-
-				tmp = append(tmp, uint32(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case UINT64_SLICE:
-		tmp := []uint64{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseUint(string(decodedValue), 10, 64)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a uint64", string(decodedValue))
-				}
-
-				tmp = append(tmp, uint64(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case FLOAT32_SLICE:
-		tmp := []float32{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseFloat(string(decodedValue), 32)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a float32", string(decodedValue))
-				}
-
-				tmp = append(tmp, float32(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case FLOAT64_SLICE:
-		tmp := []float64{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseFloat(string(decodedValue), 64)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a float64", string(decodedValue))
-				}
-
-				tmp = append(tmp, float64(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case STRING_SLICE:
-		tmp := []string{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				tmp = append(tmp, string(decodedValue))
-			}
-		}
-
-		typedJson.Value = tmp
-	case BOOL_SLICE:
-		tmp := []bool{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseBool(string(decodedValue))
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a bool", string(decodedValue))
-				}
-
-				tmp = append(tmp, val)
-			}
-		}
-
-		typedJson.Value = tmp
-	case COMPLEX64_SLICE:
-		tmp := []complex64{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseComplex(string(decodedValue), 64)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a complex64", string(decodedValue))
-				}
-
-				tmp = append(tmp, complex64(val))
-			}
-		}
-
-		typedJson.Value = tmp
-	case COMPLEX128_SLICE:
-		tmp := []complex128{}
-		if temp.Value != "" {
-			for _, value := range strings.Split(temp.Value, ",") {
-				decodedValue, err := base64.StdEncoding.DecodeString(value)
-				if err != nil {
-					return fmt.Errorf("string '%s' is not an expected base64", value)
-				}
-
-				val, err := strconv.ParseComplex(string(decodedValue), 128)
-				if err != nil {
-					return fmt.Errorf("failed to convert '%s' to a complex128", string(decodedValue))
-				}
-
-				tmp = append(tmp, val)
-			}
-		}
-
-		typedJson.Value = tmp
-	default:
-		return fmt.Errorf("unknown type '%d' to decode", temp.Type)
-	}
-
-	return nil
 }
 
 func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
@@ -671,6 +261,18 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		}
 
 		temp.Value = strconv.FormatBool(typedJson.Value.(bool))
+	case DATETIME:
+		if _, ok := typedJson.Value.(time.Time); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a datetime", typedJson.Value)
+		}
+
+		temp.Value = typedJson.Value.(time.Time).Format(time.RFC3339)
+	case TIME_DURATION:
+		if _, ok := typedJson.Value.(time.Duration); !ok {
+			return nil, fmt.Errorf("failed to cast '%v' to a time duration", typedJson.Value)
+		}
+
+		temp.Value = typedJson.Value.(time.Duration).String()
 	case COMPLEX64:
 		if _, ok := typedJson.Value.(complex64); !ok {
 			return nil, fmt.Errorf("failed to cast '%v' to a complex64", typedJson.Value)
@@ -689,11 +291,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]int); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -706,11 +307,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]int8); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -723,11 +323,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]int16); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -740,11 +339,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]int32); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(int64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -757,11 +355,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]int64); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatInt(value, 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -774,11 +371,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]uint); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -791,11 +387,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]uint8); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -808,11 +403,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]uint16); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -825,11 +419,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]uint32); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -842,11 +435,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]uint64); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatUint(uint64(value), 10)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = fmt.Sprintf("%d", value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%d", value)
 					}
 				}
 			} else {
@@ -859,11 +451,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]float32); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatFloat(float64(value), 'E', -1, 32)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = strconv.FormatFloat(float64(value), 'E', -1, 32)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%s", strconv.FormatFloat(float64(value), 'E', -1, 32))
 					}
 				}
 			} else {
@@ -876,11 +467,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]float64); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatFloat(value, 'E', -1, 64)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = strconv.FormatFloat(float64(value), 'E', -1, 64)
 					} else {
-						temp.Value += "," + str
+						temp.Value += fmt.Sprintf(",%s", strconv.FormatFloat(float64(value), 'E', -1, 64))
 					}
 				}
 			} else {
@@ -910,15 +500,46 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]bool); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatBool(value)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = strconv.FormatBool(value)
 					} else {
-						temp.Value += "," + str
+						temp.Value += "," + strconv.FormatBool(value)
 					}
 				}
 			} else {
 				return nil, fmt.Errorf("failed to cast '%v' to a []bool", typedJson.Value)
+			}
+		}
+	case DATETIME_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]time.Time); ok {
+				for index, value := range values {
+					if index == 0 {
+						temp.Value = value.Format(time.RFC3339)
+					} else {
+						temp.Value += fmt.Sprintf(",%s", value.Format(time.RFC3339))
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []datetime", typedJson.Value)
+			}
+		}
+	case TIME_DURATION_SLICE:
+		if typedJson.Value == nil {
+			temp.Value = ""
+		} else {
+			if values, ok := typedJson.Value.([]time.Duration); ok {
+				for index, value := range values {
+					if index == 0 {
+						temp.Value = value.String()
+					} else {
+						temp.Value += fmt.Sprintf(",%s", value.String())
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("failed to cast '%v' to a []duration", typedJson.Value)
 			}
 		}
 	case COMPLEX64_SLICE:
@@ -927,11 +548,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]complex64); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatComplex(complex128(value), 'E', -1, 64)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = strconv.FormatComplex(complex128(value), 'E', -1, 64)
 					} else {
-						temp.Value += "," + str
+						temp.Value += "," + strconv.FormatComplex(complex128(value), 'E', -1, 64)
 					}
 				}
 			} else {
@@ -944,11 +564,10 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 		} else {
 			if values, ok := typedJson.Value.([]complex128); ok {
 				for index, value := range values {
-					str := base64.StdEncoding.EncodeToString([]byte(strconv.FormatComplex(value, 'E', -1, 64)))
 					if index == 0 {
-						temp.Value = str
+						temp.Value = strconv.FormatComplex(value, 'E', -1, 128)
 					} else {
-						temp.Value += "," + str
+						temp.Value += "," + strconv.FormatComplex(value, 'E', -1, 128)
 					}
 				}
 			} else {
@@ -956,8 +575,419 @@ func (typedJson *TypedJson) MarshalJSON() ([]byte, error) {
 			}
 		}
 	default:
-		return nil, fmt.Errorf("unknow type '%d' to encode", temp.Type)
+		return nil, fmt.Errorf("unknow type '%s' to encode", temp.Type)
 	}
 
 	return json.Marshal(temp)
+}
+
+func (typedJson *TypedJson) UnmarshalJSON(b []byte) error {
+	temp := &struct {
+		Type  JSONTYPE `json:"Type"`
+		Value string   `json:"Value"`
+	}{}
+
+	if err := json.Unmarshal(b, temp); err != nil {
+		return err
+	}
+
+	typedJson.Type = temp.Type
+
+	// try the custom codec types
+	if typedJson.customCodec != nil {
+		if encoder, ok := typedJson.customCodec[temp.Type]; ok {
+			val, err := encoder.Decode(temp.Value)
+			if err != nil {
+				return err
+			}
+
+			typedJson.Value = val
+
+			return nil
+		}
+	}
+
+	// try the global codec types
+	if GlobalCodec != nil {
+		if encoder, ok := GlobalCodec[temp.Type]; ok {
+			val, err := encoder.Decode(temp.Value)
+			if err != nil {
+				return err
+			}
+
+			typedJson.Value = val
+
+			return nil
+		}
+	}
+
+	// try the default codec types
+	switch temp.Type {
+	case INT:
+		val, err := strconv.ParseInt(temp.Value, 10, 0)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to an int", temp.Value)
+		}
+		typedJson.Value = int(val)
+	case INT8:
+		val, err := strconv.ParseInt(temp.Value, 10, 8)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to an int8", temp.Value)
+		}
+		typedJson.Value = int8(val)
+	case INT16:
+		val, err := strconv.ParseInt(temp.Value, 10, 16)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to an int16", temp.Value)
+		}
+		typedJson.Value = int16(val)
+	case INT32:
+		val, err := strconv.ParseInt(temp.Value, 10, 32)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to an int32", temp.Value)
+		}
+		typedJson.Value = int32(val)
+	case INT64:
+		val, err := strconv.ParseInt(temp.Value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to an int64", temp.Value)
+		}
+		typedJson.Value = int64(val)
+	case UINT:
+		val, err := strconv.ParseUint(temp.Value, 10, 0)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a uint", temp.Value)
+		}
+		typedJson.Value = uint(val)
+	case UINT8:
+		val, err := strconv.ParseUint(temp.Value, 10, 8)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a uint8", temp.Value)
+		}
+		typedJson.Value = uint8(val)
+	case UINT16:
+		val, err := strconv.ParseUint(temp.Value, 10, 16)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a uint16", temp.Value)
+		}
+		typedJson.Value = uint16(val)
+	case UINT32:
+		val, err := strconv.ParseUint(temp.Value, 10, 32)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a uint32", temp.Value)
+		}
+		typedJson.Value = uint32(val)
+	case UINT64:
+		val, err := strconv.ParseUint(temp.Value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a uint64", temp.Value)
+		}
+		typedJson.Value = uint64(val)
+	case FLOAT32:
+		val, err := strconv.ParseFloat(temp.Value, 32)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a float32", temp.Value)
+		}
+		typedJson.Value = float32(val)
+	case FLOAT64:
+		val, err := strconv.ParseFloat(temp.Value, 64)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a float64", temp.Value)
+		}
+		typedJson.Value = float64(val)
+	case STRING:
+		typedJson.Value = string(temp.Value)
+	case DATETIME:
+		val, err := time.Parse(time.RFC3339, temp.Value)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a datetime", temp.Value)
+		}
+		typedJson.Value = val
+	case TIME_DURATION:
+		val, err := time.ParseDuration(temp.Value)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a time duration", temp.Value)
+		}
+		typedJson.Value = val
+	case BOOL:
+		val, err := strconv.ParseBool(temp.Value)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a bool", temp.Value)
+		}
+		typedJson.Value = bool(val)
+	case COMPLEX64:
+		val, err := strconv.ParseComplex(temp.Value, 64)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a complex64", temp.Value)
+		}
+		typedJson.Value = complex64(val)
+	case COMPLEX128:
+		val, err := strconv.ParseComplex(temp.Value, 128)
+		if err != nil {
+			return fmt.Errorf("failed to convert '%s' to a complex128", temp.Value)
+		}
+		typedJson.Value = val
+	case INT_SLICE:
+		tmp := []int{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseInt(value, 10, 0)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int", value)
+				}
+
+				tmp = append(tmp, int(val))
+			}
+
+			typedJson.Value = tmp
+		}
+
+		typedJson.Value = tmp
+	case INT8_SLICE:
+		tmp := []int8{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseInt(value, 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int8", value)
+				}
+
+				tmp = append(tmp, int8(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT16_SLICE:
+		tmp := []int16{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseInt(value, 10, 16)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int16", value)
+				}
+
+				tmp = append(tmp, int16(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT32_SLICE:
+		tmp := []int32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseInt(value, 10, 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int32", value)
+				}
+
+				tmp = append(tmp, int32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case INT64_SLICE:
+		tmp := []int64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseInt(value, 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to an int64", value)
+				}
+
+				tmp = append(tmp, int64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT_SLICE:
+		tmp := []uint{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseUint(value, 10, 0)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint", value)
+				}
+
+				tmp = append(tmp, uint(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT8_SLICE:
+		tmp := []uint8{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseUint(value, 10, 8)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint8", value)
+				}
+
+				tmp = append(tmp, uint8(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT16_SLICE:
+		tmp := []uint16{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseUint(value, 10, 16)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint16", value)
+				}
+
+				tmp = append(tmp, uint16(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT32_SLICE:
+		tmp := []uint32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseUint(value, 10, 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint32", value)
+				}
+
+				tmp = append(tmp, uint32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case UINT64_SLICE:
+		tmp := []uint64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseUint(value, 10, 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a uint64", value)
+				}
+
+				tmp = append(tmp, uint64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case FLOAT32_SLICE:
+		tmp := []float32{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseFloat(value, 32)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a float32", value)
+				}
+
+				tmp = append(tmp, float32(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case FLOAT64_SLICE:
+		tmp := []float64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseFloat(value, 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a float64", value)
+				}
+
+				tmp = append(tmp, float64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case STRING_SLICE:
+		tmp := []string{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				decodedValue, err := base64.StdEncoding.DecodeString(value)
+				if err != nil {
+					return fmt.Errorf("string '%s' is not an expected base64", value)
+				}
+
+				tmp = append(tmp, string(decodedValue))
+			}
+		}
+
+		typedJson.Value = tmp
+	case BOOL_SLICE:
+		tmp := []bool{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseBool(value)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a bool", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+		}
+
+		typedJson.Value = tmp
+	case DATETIME_SLICE:
+		tmp := []time.Time{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := time.Parse(time.RFC3339, value)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a datetime", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+
+			typedJson.Value = tmp
+		}
+
+		typedJson.Value = tmp
+	case TIME_DURATION_SLICE:
+		tmp := []time.Duration{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := time.ParseDuration(value)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a duration", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+
+			typedJson.Value = tmp
+		}
+
+		typedJson.Value = tmp
+	case COMPLEX64_SLICE:
+		tmp := []complex64{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseComplex(value, 64)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a complex64", value)
+				}
+
+				tmp = append(tmp, complex64(val))
+			}
+		}
+
+		typedJson.Value = tmp
+	case COMPLEX128_SLICE:
+		tmp := []complex128{}
+		if temp.Value != "" {
+			for _, value := range strings.Split(temp.Value, ",") {
+				val, err := strconv.ParseComplex(value, 128)
+				if err != nil {
+					return fmt.Errorf("failed to convert '%s' to a complex128", value)
+				}
+
+				tmp = append(tmp, val)
+			}
+		}
+
+		typedJson.Value = tmp
+	default:
+		return fmt.Errorf("unknown type '%s' to decode", temp.Type)
+	}
+
+	return nil
 }

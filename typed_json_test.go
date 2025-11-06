@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	gotypedjson "github.com/DanLavine/go-typed-json"
 	. "github.com/onsi/gomega"
@@ -38,10 +39,38 @@ func Test_NewTypedJson(t *testing.T) {
 	})
 }
 
+func Test_NewTypedJsonDecoder(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("It panics if a codec encode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Encode: func(val any) (string, error) { return "", nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewTypedJsonDecoder(codec)
+		}).To(Panic())
+	})
+
+	t.Run("It panics if a codec decode value is missing", func(t *testing.T) {
+		codec := gotypedjson.CustomCodec{
+			gotypedjson.BOOL: gotypedjson.Codec{
+				Decode: func(s string) (any, error) { return nil, nil },
+			},
+		}
+
+		g.Expect(func() {
+			gotypedjson.NewTypedJsonDecoder(codec)
+		}).To(Panic())
+	})
+}
+
 func Test_Int(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":1,"Value":"4"}`
+	rawData := `{"Type":"_int","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -65,7 +94,7 @@ func Test_Int(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":1,"Value":"nope"}`), tInt)
+			err := json.Unmarshal([]byte(`{"Type":"_int","Value":"nope"}`), tInt)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int"))
 		})
@@ -84,7 +113,7 @@ func Test_Int(t *testing.T) {
 func Test_Int8(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":2,"Value":"4"}`
+	rawData := `{"Type":"_int8","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -108,7 +137,7 @@ func Test_Int8(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt8 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":2,"Value":"nope"}`), tInt8)
+			err := json.Unmarshal([]byte(`{"Type":"_int8","Value":"nope"}`), tInt8)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int8"))
 		})
@@ -127,7 +156,7 @@ func Test_Int8(t *testing.T) {
 func Test_Int16(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":3,"Value":"4"}`
+	rawData := `{"Type":"_int16","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -151,7 +180,7 @@ func Test_Int16(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt16 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":3,"Value":"nope"}`), tInt16)
+			err := json.Unmarshal([]byte(`{"Type":"_int16","Value":"nope"}`), tInt16)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int16"))
 		})
@@ -170,7 +199,7 @@ func Test_Int16(t *testing.T) {
 func Test_Int32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":4,"Value":"4"}`
+	rawData := `{"Type":"_int32","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -194,7 +223,7 @@ func Test_Int32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":4,"Value":"nope"}`), tInt32)
+			err := json.Unmarshal([]byte(`{"Type":"_int32","Value":"nope"}`), tInt32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int32"))
 		})
@@ -213,7 +242,7 @@ func Test_Int32(t *testing.T) {
 func Test_Int64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":5,"Value":"4"}`
+	rawData := `{"Type":"_int64","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -237,7 +266,7 @@ func Test_Int64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tInt64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":5,"Value":"nope"}`), tInt64)
+			err := json.Unmarshal([]byte(`{"Type":"_int64","Value":"nope"}`), tInt64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to an int64"))
 		})
@@ -256,7 +285,7 @@ func Test_Int64(t *testing.T) {
 func Test_Uint(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":6,"Value":"4"}`
+	rawData := `{"Type":"_uint","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -280,7 +309,7 @@ func Test_Uint(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":6,"Value":"nope"}`), tUint)
+			err := json.Unmarshal([]byte(`{"Type":"_uint","Value":"nope"}`), tUint)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint"))
 		})
@@ -299,7 +328,7 @@ func Test_Uint(t *testing.T) {
 func Test_Uint8(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":7,"Value":"4"}`
+	rawData := `{"Type":"_uint8","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -323,7 +352,7 @@ func Test_Uint8(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint8 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":7,"Value":"nope"}`), tUint8)
+			err := json.Unmarshal([]byte(`{"Type":"_uint8","Value":"nope"}`), tUint8)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint8"))
 		})
@@ -342,7 +371,7 @@ func Test_Uint8(t *testing.T) {
 func Test_Uint16(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":8,"Value":"4"}`
+	rawData := `{"Type":"_uint16","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -366,7 +395,7 @@ func Test_Uint16(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint16 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":8,"Value":"nope"}`), tUint16)
+			err := json.Unmarshal([]byte(`{"Type":"_uint16","Value":"nope"}`), tUint16)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint16"))
 		})
@@ -385,7 +414,7 @@ func Test_Uint16(t *testing.T) {
 func Test_Uint32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":9,"Value":"4"}`
+	rawData := `{"Type":"_uint32","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -409,7 +438,7 @@ func Test_Uint32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":9,"Value":"nope"}`), tUint32)
+			err := json.Unmarshal([]byte(`{"Type":"_uint32","Value":"nope"}`), tUint32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint32"))
 		})
@@ -428,7 +457,7 @@ func Test_Uint32(t *testing.T) {
 func Test_Uint64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":10,"Value":"4"}`
+	rawData := `{"Type":"_uint64","Value":"4"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -452,7 +481,7 @@ func Test_Uint64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tUint64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":10,"Value":"nope"}`), tUint64)
+			err := json.Unmarshal([]byte(`{"Type":"_uint64","Value":"nope"}`), tUint64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a uint64"))
 		})
@@ -471,7 +500,7 @@ func Test_Uint64(t *testing.T) {
 func Test_Float32(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":11,"Value":"4E+00"}`
+	rawData := `{"Type":"_float32","Value":"4E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -495,7 +524,7 @@ func Test_Float32(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tFloat32 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":11,"Value":"nope"}`), tFloat32)
+			err := json.Unmarshal([]byte(`{"Type":"_float32","Value":"nope"}`), tFloat32)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a float32"))
 		})
@@ -514,7 +543,7 @@ func Test_Float32(t *testing.T) {
 func Test_Float64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":12,"Value":"4E+00"}`
+	rawData := `{"Type":"_float64","Value":"4E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -538,7 +567,7 @@ func Test_Float64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tFloat64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":12,"Value":"nope"}`), tFloat64)
+			err := json.Unmarshal([]byte(`{"Type":"_float64","Value":"nope"}`), tFloat64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a float64"))
 		})
@@ -557,7 +586,7 @@ func Test_Float64(t *testing.T) {
 func Test_String(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":13,"Value":"proper string"}`
+	rawData := `{"Type":"_string","Value":"proper string"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -581,7 +610,7 @@ func Test_String(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tString := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":13,"Value":3}`), tString)
+			err := json.Unmarshal([]byte(`{"Type":"_string","Value":3}`), tString)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("json: cannot unmarshal number into Go struct field .Value of type string"))
 		})
@@ -600,7 +629,7 @@ func Test_String(t *testing.T) {
 func Test_Bool(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":14,"Value":"true"}`
+	rawData := `{"Type":"_bool","Value":"true"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -624,7 +653,7 @@ func Test_Bool(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tBool := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":14,"Value":"nope"}`), tBool)
+			err := json.Unmarshal([]byte(`{"Type":"_bool","Value":"nope"}`), tBool)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a bool"))
 		})
@@ -640,10 +669,95 @@ func Test_Bool(t *testing.T) {
 	})
 }
 
+func Test_DateTime(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDateTime := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME, Value: "nope"}
+			data, err := json.Marshal(tDateTime)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a datetime"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			currentTime := time.Now()
+			tDateTime := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME, Value: currentTime}
+
+			data, err := json.Marshal(tDateTime)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(fmt.Sprintf(`{"Type":"_datetime","Value":"%s"}`, currentTime.Format(time.RFC3339))))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tDateTime := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_datetime","Value":"nope"}`), tDateTime)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a datetime"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tDateTime := &gotypedjson.TypedJson{}
+			testTime := time.Now()
+
+			err := json.Unmarshal([]byte(fmt.Sprintf(`{"Type":"_datetime","Value":"%s"}`, testTime.Format(time.RFC3339))), tDateTime)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTime.Type).To(Equal(gotypedjson.DATETIME))
+			g.Expect(tDateTime.Value.(time.Time).Format(time.RFC3339)).To(Equal(testTime.Format(time.RFC3339)))
+		})
+	})
+}
+
+func Test_Duration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDuration := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION, Value: "nope"}
+
+			data, err := json.Marshal(tDuration)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a time duration"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode the value properly", func(t *testing.T) {
+			tDuration := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION, Value: time.Duration(4 * time.Millisecond)}
+
+			data, err := json.Marshal(tDuration)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(`{"Type":"_duration","Value":"4ms"}`))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
+			tDuration := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_duration","Value":"nope"}`), tDuration)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a time duration"))
+		})
+
+		t.Run("It can decode the value properly", func(t *testing.T) {
+			tDuration := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_duration","Value":"4ms"}`), tDuration)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDuration.Type).To(Equal(gotypedjson.TIME_DURATION))
+			g.Expect(tDuration.Value.(time.Duration)).To(Equal(4 * time.Millisecond))
+		})
+	})
+}
+
 func Test_Complex64(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":15,"Value":"(1E+00-3E+00i)"}`
+	rawData := `{"Type":"_complex64","Value":"(1E+00-3E+00i)"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -667,7 +781,7 @@ func Test_Complex64(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tComplex64 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":15,"Value":"nope"}`), tComplex64)
+			err := json.Unmarshal([]byte(`{"Type":"_complex64","Value":"nope"}`), tComplex64)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a complex64"))
 		})
@@ -686,7 +800,7 @@ func Test_Complex64(t *testing.T) {
 func Test_Complex128(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawData := `{"Type":16,"Value":"(1E+00-3E+00i)"}`
+	rawData := `{"Type":"_complex128","Value":"(1E+00-3E+00i)"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -710,7 +824,7 @@ func Test_Complex128(t *testing.T) {
 		t.Run("It fails to decode an incorrect value", func(t *testing.T) {
 			tComplex128 := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":16,"Value":"nope"}`), tComplex128)
+			err := json.Unmarshal([]byte(`{"Type":"_complex128","Value":"nope"}`), tComplex128)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'nope' to a complex128"))
 		})
@@ -729,9 +843,9 @@ func Test_Complex128(t *testing.T) {
 func Test_Int_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":101,"Value":""}`
-	rawDataSingle := `{"Type":101,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":101,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_int_array","Value":""}`
+	rawDataSingle := `{"Type":"_int_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_int_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -768,18 +882,10 @@ func Test_Int_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tInt := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":101,"Value":"/>??a"}`), tInt)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tInt := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":101,"Value":"aGVsbG8="}`), tInt)
+			err := json.Unmarshal([]byte(`{"Type":"_int_array","Value":"hello"}`), tInt)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to an int"))
 		})
@@ -816,9 +922,9 @@ func Test_Int_Slice(t *testing.T) {
 func Test_Int8_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":102,"Value":""}`
-	rawDataSingle := `{"Type":102,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":102,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_int8_array","Value":""}`
+	rawDataSingle := `{"Type":"_int8_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_int8_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -855,18 +961,10 @@ func Test_Int8_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tInt8S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":102,"Value":"/>??a"}`), tInt8S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tInt8S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":102,"Value":"aGVsbG8="}`), tInt8S)
+			err := json.Unmarshal([]byte(`{"Type":"_int8_array","Value":"hello"}`), tInt8S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to an int8"))
 		})
@@ -903,9 +1001,9 @@ func Test_Int8_Slice(t *testing.T) {
 func Test_Int16_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":103,"Value":""}`
-	rawDataSingle := `{"Type":103,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":103,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_int16_array","Value":""}`
+	rawDataSingle := `{"Type":"_int16_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_int16_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -942,18 +1040,10 @@ func Test_Int16_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tInt16S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":103,"Value":"/>??a"}`), tInt16S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tInt16S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":103,"Value":"aGVsbG8="}`), tInt16S)
+			err := json.Unmarshal([]byte(`{"Type":"_int16_array","Value":"hello"}`), tInt16S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to an int16"))
 		})
@@ -990,9 +1080,9 @@ func Test_Int16_Slice(t *testing.T) {
 func Test_Int32_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":104,"Value":""}`
-	rawDataSingle := `{"Type":104,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":104,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_int32_array","Value":""}`
+	rawDataSingle := `{"Type":"_int32_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_int32_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1029,18 +1119,10 @@ func Test_Int32_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tInt32S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":104,"Value":"/>??a"}`), tInt32S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tInt32S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":104,"Value":"aGVsbG8="}`), tInt32S)
+			err := json.Unmarshal([]byte(`{"Type":"_int32_array","Value":"hello"}`), tInt32S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to an int32"))
 		})
@@ -1077,9 +1159,9 @@ func Test_Int32_Slice(t *testing.T) {
 func Test_Int64_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":105,"Value":""}`
-	rawDataSingle := `{"Type":105,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":105,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_int64_array","Value":""}`
+	rawDataSingle := `{"Type":"_int64_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_int64_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1116,18 +1198,10 @@ func Test_Int64_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tInt64S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":105,"Value":"/>??a"}`), tInt64S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tInt64S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":105,"Value":"aGVsbG8="}`), tInt64S)
+			err := json.Unmarshal([]byte(`{"Type":"_int64_array","Value":"hello"}`), tInt64S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to an int64"))
 		})
@@ -1164,9 +1238,9 @@ func Test_Int64_Slice(t *testing.T) {
 func Test_Uint_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":106,"Value":""}`
-	rawDataSingle := `{"Type":106,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":106,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_uint_array","Value":""}`
+	rawDataSingle := `{"Type":"_uint_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_uint_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1203,18 +1277,10 @@ func Test_Uint_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tUint := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":106,"Value":"/>??a"}`), tUint)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tUint := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":106,"Value":"aGVsbG8="}`), tUint)
+			err := json.Unmarshal([]byte(`{"Type":"_uint_array","Value":"hello"}`), tUint)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a uint"))
 		})
@@ -1251,9 +1317,9 @@ func Test_Uint_Slice(t *testing.T) {
 func Test_Uint8_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":107,"Value":""}`
-	rawDataSingle := `{"Type":107,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":107,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_uint8_array","Value":""}`
+	rawDataSingle := `{"Type":"_uint8_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_uint8_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1290,18 +1356,10 @@ func Test_Uint8_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tUint8S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":107,"Value":"/>??a"}`), tUint8S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tUint8S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":107,"Value":"aGVsbG8="}`), tUint8S)
+			err := json.Unmarshal([]byte(`{"Type":"_uint8_array","Value":"hello"}`), tUint8S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a uint8"))
 		})
@@ -1338,9 +1396,9 @@ func Test_Uint8_Slice(t *testing.T) {
 func Test_Uint16_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":108,"Value":""}`
-	rawDataSingle := `{"Type":108,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":108,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_uint16_array","Value":""}`
+	rawDataSingle := `{"Type":"_uint16_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_uint16_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1377,18 +1435,10 @@ func Test_Uint16_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tUint16S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":108,"Value":"/>??a"}`), tUint16S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tUint16S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":108,"Value":"aGVsbG8="}`), tUint16S)
+			err := json.Unmarshal([]byte(`{"Type":"_uint16_array","Value":"hello"}`), tUint16S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a uint16"))
 		})
@@ -1425,9 +1475,9 @@ func Test_Uint16_Slice(t *testing.T) {
 func Test_Uint32_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":109,"Value":""}`
-	rawDataSingle := `{"Type":109,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":109,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_uint32_array","Value":""}`
+	rawDataSingle := `{"Type":"_uint32_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_uint32_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1464,18 +1514,10 @@ func Test_Uint32_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tUint32S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":109,"Value":"/>??a"}`), tUint32S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tUint32S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":109,"Value":"aGVsbG8="}`), tUint32S)
+			err := json.Unmarshal([]byte(`{"Type":"_uint32_array","Value":"hello"}`), tUint32S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a uint32"))
 		})
@@ -1512,9 +1554,9 @@ func Test_Uint32_Slice(t *testing.T) {
 func Test_Uint64_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":110,"Value":""}`
-	rawDataSingle := `{"Type":110,"Value":"MQ=="}`
-	rawDataMulti := `{"Type":110,"Value":"MQ==,Mg=="}`
+	rawDataEmpty := `{"Type":"_uint64_array","Value":""}`
+	rawDataSingle := `{"Type":"_uint64_array","Value":"1"}`
+	rawDataMulti := `{"Type":"_uint64_array","Value":"1,2"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1551,18 +1593,10 @@ func Test_Uint64_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tUint64S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":110,"Value":"/>??a"}`), tUint64S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tUint64S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":110,"Value":"aGVsbG8="}`), tUint64S)
+			err := json.Unmarshal([]byte(`{"Type":"_uint64_array","Value":"hello"}`), tUint64S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a uint64"))
 		})
@@ -1599,9 +1633,9 @@ func Test_Uint64_Slice(t *testing.T) {
 func Test_Float32_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":111,"Value":""}`
-	rawDataSingle := `{"Type":111,"Value":"MUUrMDA="}`
-	rawDataMulti := `{"Type":111,"Value":"MUUrMDA=,MkUrMDA="}`
+	rawDataEmpty := `{"Type":"_float32_array","Value":""}`
+	rawDataSingle := `{"Type":"_float32_array","Value":"1E+00"}`
+	rawDataMulti := `{"Type":"_float32_array","Value":"1E+00,2E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1638,18 +1672,10 @@ func Test_Float32_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tFloat32S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":111,"Value":"/>??a"}`), tFloat32S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tFloat32S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":111,"Value":"aGVsbG8="}`), tFloat32S)
+			err := json.Unmarshal([]byte(`{"Type":"_float32_array","Value":"hello"}`), tFloat32S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a float32"))
 		})
@@ -1686,9 +1712,9 @@ func Test_Float32_Slice(t *testing.T) {
 func Test_Float64_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":112,"Value":""}`
-	rawDataSingle := `{"Type":112,"Value":"MUUrMDA="}`
-	rawDataMulti := `{"Type":112,"Value":"MUUrMDA=,MkUrMDA="}`
+	rawDataEmpty := `{"Type":"_float64_array","Value":""}`
+	rawDataSingle := `{"Type":"_float64_array","Value":"1E+00"}`
+	rawDataMulti := `{"Type":"_float64_array","Value":"1E+00,2E+00"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1725,18 +1751,10 @@ func Test_Float64_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tFloat64S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":112,"Value":"/>??a"}`), tFloat64S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tFloat64S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":112,"Value":"aGVsbG8="}`), tFloat64S)
+			err := json.Unmarshal([]byte(`{"Type":"_float64_array","Value":"hello"}`), tFloat64S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a float64"))
 		})
@@ -1773,9 +1791,9 @@ func Test_Float64_Slice(t *testing.T) {
 func Test_String_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":113,"Value":""}`
-	rawDataSingle := `{"Type":113,"Value":"aGVsbG8="}`
-	rawDataMulti := `{"Type":113,"Value":"aGVsbG8=,d29ybGQ="}`
+	rawDataEmpty := `{"Type":"_string_array","Value":""}`
+	rawDataSingle := `{"Type":"_string_array","Value":"aGVsbG8="}`
+	rawDataMulti := `{"Type":"_string_array","Value":"aGVsbG8=,d29ybGQ="}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1815,7 +1833,7 @@ func Test_String_Slice(t *testing.T) {
 		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
 			tFloat64S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":113,"Value":"/>??a"}`), tFloat64S)
+			err := json.Unmarshal([]byte(`{"Type":"_string_array","Value":"/>??a"}`), tFloat64S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
 		})
@@ -1852,9 +1870,9 @@ func Test_String_Slice(t *testing.T) {
 func Test_Bool_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":114,"Value":""}`
-	rawDataSingle := `{"Type":114,"Value":"dHJ1ZQ=="}`
-	rawDataMulti := `{"Type":114,"Value":"dHJ1ZQ==,ZmFsc2U="}`
+	rawDataEmpty := `{"Type":"_bool_array","Value":""}`
+	rawDataSingle := `{"Type":"_bool_array","Value":"true"}`
+	rawDataMulti := `{"Type":"_bool_array","Value":"true,false"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1891,18 +1909,10 @@ func Test_Bool_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tBoolS := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":114,"Value":"/>??a"}`), tBoolS)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tBoolS := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":114,"Value":"aGVsbG8="}`), tBoolS)
+			err := json.Unmarshal([]byte(`{"Type":"_bool_array","Value":"hello"}`), tBoolS)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a bool"))
 		})
@@ -1936,12 +1946,178 @@ func Test_Bool_Slice(t *testing.T) {
 	})
 }
 
+func Test_DateTime_Slice(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	timeOne := time.Now()
+	timeTwo := time.Now()
+
+	rawDataEmpty := `{"Type":"_datetime_array","Value":""}`
+	rawDataSingle := fmt.Sprintf(`{"Type":"_datetime_array","Value":"%s"}`, timeOne.Format(time.RFC3339))
+	rawDataMulti := fmt.Sprintf(`{"Type":"_datetime_array","Value":"%s,%s"}`, timeOne.Format(time.RFC3339), timeTwo.Format(time.RFC3339))
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: "nope"}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a []datetime"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode an empty slice", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: nil}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataEmpty))
+		})
+
+		t.Run("It can encode a single value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: []time.Time{timeOne}}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataSingle))
+		})
+
+		t.Run("It can encode multiple value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{Type: gotypedjson.DATETIME_SLICE, Value: []time.Time{timeOne, timeTwo}}
+
+			data, err := json.Marshal(tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataMulti))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an invalid value", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_datetime_array","Value":"hello"}`), tDateTimeS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a datetime"))
+		})
+
+		t.Run("It can decode an empty slice", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataEmpty), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(tDateTimeS.Value.([]time.Time)).To(Equal([]time.Time{}))
+		})
+
+		t.Run("It can decode a single value properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataSingle), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(len(tDateTimeS.Value.(([]time.Time)))).To(Equal(1))
+			g.Expect(tDateTimeS.Value.([]time.Time)[0].Format(time.RFC3339)).To(Equal(timeOne.Format(time.RFC3339)))
+		})
+
+		t.Run("It can decode multiple values properly", func(t *testing.T) {
+			tDateTimeS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataMulti), tDateTimeS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDateTimeS.Type).To(Equal(gotypedjson.DATETIME_SLICE))
+			g.Expect(len(tDateTimeS.Value.(([]time.Time)))).To(Equal(2))
+			g.Expect(tDateTimeS.Value.([]time.Time)[0].Format(time.RFC3339)).To(Equal(timeOne.Format(time.RFC3339)))
+			g.Expect(tDateTimeS.Value.([]time.Time)[1].Format(time.RFC3339)).To(Equal(timeTwo.Format(time.RFC3339)))
+		})
+	})
+}
+
+func Test_Duration_Slice(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	rawDataEmpty := `{"Type":"_duration_array","Value":""}`
+	rawDataSingle := `{"Type":"_duration_array","Value":"2s"}`
+	rawDataMulti := `{"Type":"_duration_array","Value":"2s,3ms"}`
+
+	t.Run("Encoding", func(t *testing.T) {
+		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: "nope"}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("json: error calling MarshalJSON for type *gotypedjson.TypedJson: failed to cast 'nope' to a []duration"))
+			g.Expect(data).To(BeNil())
+		})
+
+		t.Run("It can encode an empty slice", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: nil}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataEmpty))
+		})
+
+		t.Run("It can encode a single value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: []time.Duration{2 * time.Second}}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataSingle))
+		})
+
+		t.Run("It can encode multiple value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{Type: gotypedjson.TIME_DURATION_SLICE, Value: []time.Duration{2 * time.Second, 3 * time.Millisecond}}
+
+			data, err := json.Marshal(tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(string(data)).To(Equal(rawDataMulti))
+		})
+	})
+
+	t.Run("Decoding", func(t *testing.T) {
+		t.Run("It fails to decode an invalid value", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(`{"Type":"_duration_array","Value":"hello"}`), tDurationS)
+			g.Expect(err).To(HaveOccurred())
+			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a duration"))
+		})
+
+		t.Run("It can decode an empty slice", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataEmpty), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.([]time.Duration)).To(Equal([]time.Duration{}))
+		})
+
+		t.Run("It can decode a single value properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataSingle), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.(([]time.Duration))).To(Equal([]time.Duration{2 * time.Second}))
+		})
+
+		t.Run("It can decode multiple values properly", func(t *testing.T) {
+			tDurationS := &gotypedjson.TypedJson{}
+
+			err := json.Unmarshal([]byte(rawDataMulti), tDurationS)
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(tDurationS.Type).To(Equal(gotypedjson.TIME_DURATION_SLICE))
+			g.Expect(tDurationS.Value.(([]time.Duration))).To(Equal([]time.Duration{2 * time.Second, 3 * time.Millisecond}))
+		})
+	})
+}
+
 func Test_Complex64_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":115,"Value":""}`
-	rawDataSingle := `{"Type":115,"Value":"KDFFKzAwLTNFKzAwaSk="}`
-	rawDataMulti := `{"Type":115,"Value":"KDFFKzAwLTNFKzAwaSk=,KDJFKzAwLTVFKzAwaSk="}`
+	rawDataEmpty := `{"Type":"_complex64_array","Value":""}`
+	rawDataSingle := `{"Type":"_complex64_array","Value":"(1E+00-3E+00i)"}`
+	rawDataMulti := `{"Type":"_complex64_array","Value":"(1E+00-3E+00i),(2E+00-5E+00i)"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -1978,18 +2154,10 @@ func Test_Complex64_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tComplex64S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":115,"Value":"/>??a"}`), tComplex64S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tComplex64S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":115,"Value":"aGVsbG8="}`), tComplex64S)
+			err := json.Unmarshal([]byte(`{"Type":"_complex64_array","Value":"hello"}`), tComplex64S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a complex64"))
 		})
@@ -2026,9 +2194,9 @@ func Test_Complex64_Slice(t *testing.T) {
 func Test_Complex128_Slice(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	rawDataEmpty := `{"Type":116,"Value":""}`
-	rawDataSingle := `{"Type":116,"Value":"KDFFKzAwLTNFKzAwaSk="}`
-	rawDataMulti := `{"Type":116,"Value":"KDFFKzAwLTNFKzAwaSk=,KDJFKzAwLTVFKzAwaSk="}`
+	rawDataEmpty := `{"Type":"_complex128_array","Value":""}`
+	rawDataSingle := `{"Type":"_complex128_array","Value":"(1E+00-3E+00i)"}`
+	rawDataMulti := `{"Type":"_complex128_array","Value":"(1E+00-3E+00i),(2E+00-5E+00i)"}`
 
 	t.Run("Encoding", func(t *testing.T) {
 		t.Run("It returns an error if the type can not be cast", func(t *testing.T) {
@@ -2065,18 +2233,10 @@ func Test_Complex128_Slice(t *testing.T) {
 	})
 
 	t.Run("Decoding", func(t *testing.T) {
-		t.Run("It fails to decode a non-base64 value", func(t *testing.T) {
-			tComplex128S := &gotypedjson.TypedJson{}
-
-			err := json.Unmarshal([]byte(`{"Type":116,"Value":"/>??a"}`), tComplex128S)
-			g.Expect(err).To(HaveOccurred())
-			g.Expect(err.Error()).To(Equal("string '/>??a' is not an expected base64"))
-		})
-
 		t.Run("It fails to decode an invalid value", func(t *testing.T) {
 			tComplex128S := &gotypedjson.TypedJson{}
 
-			err := json.Unmarshal([]byte(`{"Type":116,"Value":"aGVsbG8="}`), tComplex128S)
+			err := json.Unmarshal([]byte(`{"Type":"_complex128_array","Value":"hello"}`), tComplex128S)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("failed to convert 'hello' to a complex128"))
 		})
@@ -2114,19 +2274,19 @@ func Test_Codec(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	t.Run("It errors if the encoder does not know they type", func(t *testing.T) {
-		tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(0), 0, nil)
+		tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE("test"), 0, nil)
 
 		_, err := tCustom.MarshalJSON()
 		g.Expect(err).To(HaveOccurred())
-		g.Expect(err.Error()).To(Equal("unknow type '0' to encode"))
+		g.Expect(err.Error()).To(Equal("unknow type 'test' to encode"))
 	})
 
 	t.Run("It errors if the decoder does not know they type", func(t *testing.T) {
-		tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(0), 0, nil)
+		tCustom := gotypedjson.NewTypedJsonDecoder(nil)
 
-		err := json.Unmarshal([]byte(`{"Type":0,"Value":"10"}`), tCustom)
+		err := json.Unmarshal([]byte(`{"Type":"Test","Value":"10"}`), tCustom)
 		g.Expect(err).To(HaveOccurred())
-		g.Expect(err.Error()).To(Equal("unknown type '0' to decode"))
+		g.Expect(err.Error()).To(Equal("unknown type 'Test' to decode"))
 	})
 
 	t.Run("Describe codec set on the typedJSON", func(t *testing.T) {
@@ -2144,7 +2304,7 @@ func Test_Codec(t *testing.T) {
 					return int(val) - 5, nil
 				},
 			},
-			gotypedjson.JSONTYPE(1024): {
+			gotypedjson.JSONTYPE("error"): {
 				Encode: func(val any) (string, error) {
 					return "", fmt.Errorf("error encoding")
 				},
@@ -2159,11 +2319,11 @@ func Test_Codec(t *testing.T) {
 
 			data, err := tCustom.MarshalJSON()
 			g.Expect(err).ToNot(HaveOccurred())
-			g.Expect(string(data)).To(Equal(`{"Type":1,"Value":"10"}`))
+			g.Expect(string(data)).To(Equal(`{"Type":"_int","Value":"10"}`))
 		})
 
 		t.Run("It forwards custom encoder errors", func(t *testing.T) {
-			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(1024), 5, codec)
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE("error"), 5, codec)
 
 			_, err := tCustom.MarshalJSON()
 			g.Expect(err).To(HaveOccurred())
@@ -2173,16 +2333,16 @@ func Test_Codec(t *testing.T) {
 		t.Run("It can use the custom decoder", func(t *testing.T) {
 			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, codec)
 
-			err := json.Unmarshal([]byte(`{"Type":1,"Value":"10"}`), tCustom)
+			err := json.Unmarshal([]byte(`{"Type":"_int","Value":"10"}`), tCustom)
 			g.Expect(err).ToNot(HaveOccurred())
 			g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
 			g.Expect(tCustom.Value.(int)).To(Equal(5))
 		})
 
 		t.Run("It forwards custom decoder errors", func(t *testing.T) {
-			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(1024), 0, codec)
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE("error"), 0, codec)
 
-			err := json.Unmarshal([]byte(`{"Type":1024,"Value":"10"}`), tCustom)
+			err := json.Unmarshal([]byte(`{"Type":"error","Value":"10"}`), tCustom)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("error decoding"))
 		})
@@ -2203,7 +2363,7 @@ func Test_Codec(t *testing.T) {
 					return int(val) - 5, nil
 				},
 			},
-			gotypedjson.JSONTYPE(1024): {
+			gotypedjson.JSONTYPE("error"): {
 				Encode: func(val any) (string, error) {
 					return "", fmt.Errorf("error encoding")
 				},
@@ -2222,11 +2382,11 @@ func Test_Codec(t *testing.T) {
 
 			data, err := tCustom.MarshalJSON()
 			g.Expect(err).ToNot(HaveOccurred())
-			g.Expect(string(data)).To(Equal(`{"Type":1,"Value":"10"}`))
+			g.Expect(string(data)).To(Equal(`{"Type":"_int","Value":"10"}`))
 		})
 
 		t.Run("It forwards global encoder errors", func(t *testing.T) {
-			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(1024), 5, nil)
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE("error"), 5, nil)
 
 			_, err := tCustom.MarshalJSON()
 			g.Expect(err).To(HaveOccurred())
@@ -2236,16 +2396,16 @@ func Test_Codec(t *testing.T) {
 		t.Run("It can use the global decoder", func(t *testing.T) {
 			tCustom := gotypedjson.NewTypedJson(gotypedjson.INT, 0, nil)
 
-			err := json.Unmarshal([]byte(`{"Type":1,"Value":"10"}`), tCustom)
+			err := json.Unmarshal([]byte(`{"Type":"_int","Value":"10"}`), tCustom)
 			g.Expect(err).ToNot(HaveOccurred())
 			g.Expect(tCustom.Type).To(Equal(gotypedjson.INT))
 			g.Expect(tCustom.Value.(int)).To(Equal(5))
 		})
 
 		t.Run("It forwards global decoder errors", func(t *testing.T) {
-			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE(1024), 0, nil)
+			tCustom := gotypedjson.NewTypedJson(gotypedjson.JSONTYPE("error"), 0, nil)
 
-			err := json.Unmarshal([]byte(`{"Type":1024,"Value":"10"}`), tCustom)
+			err := json.Unmarshal([]byte(`{"Type":"error","Value":"10"}`), tCustom)
 			g.Expect(err).To(HaveOccurred())
 			g.Expect(err.Error()).To(Equal("error decoding"))
 		})
@@ -2260,7 +2420,7 @@ func Test_OmitEmptyPreserved(t *testing.T) {
 		Two *gotypedjson.TypedJson `json:"two,omitempty"`
 	}{}
 
-	rawJSON := `{"one":{"Type":1,"Value":"4"}}`
+	rawJSON := `{"one":{"Type":"_int","Value":"4"}}`
 
 	g.Expect(json.Unmarshal([]byte(rawJSON), &testStruct)).ToNot(HaveOccurred())
 	g.Expect(testStruct.One.Type).To(Equal(gotypedjson.INT))
