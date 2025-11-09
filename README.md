@@ -72,7 +72,7 @@ goal is to accept arbitrary structures of unknow data.
 
 NOTE:
 Go-Typed-JSON reserves all key words begining with an `_`. This allows the packages to add any addition built in data
-types, all prefiexed with a `_`.. 
+types, all prefiexed with a `_`.
 
 #### Global Codec
 

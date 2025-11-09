@@ -54,9 +54,8 @@ const (
 	BOOL_SLICE          JSONTYPE = "_bool_array"
 	DATETIME_SLICE      JSONTYPE = "_datetime_array"
 	TIME_DURATION_SLICE JSONTYPE = "_duration_array"
-
-	COMPLEX64_SLICE  JSONTYPE = "_complex64_array"
-	COMPLEX128_SLICE JSONTYPE = "_complex128_array"
+	COMPLEX64_SLICE     JSONTYPE = "_complex64_array"
+	COMPLEX128_SLICE    JSONTYPE = "_complex128_array"
 )
 
 // Codec are used to Encode and Decode JSONTYPE data
